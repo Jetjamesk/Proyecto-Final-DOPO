@@ -17,7 +17,8 @@ public class POOBSoccerGUI extends JFrame {
        //De esta manera se guardaran los panels, imaginalo como un mazo de cartas. Los instanciamos y los vamos colocando
        //De manera que los botones son redirigan al siguiente Panel y adaptamos los botones y tal
        MenuGUI panelMenu = new MenuGUI(mainCardContainer, cardLayout);
-       BallDemoGUI panelGame = new BallDemoGUI(mainCardContainer, cardLayout);
+       //OptionGamesGUI panelOptionGames = new OptionGamesGUI(mainCardContainer, cardLayout);
+       GameGUI panelGame = new GameGUI(mainCardContainer, cardLayout);
        //Aqui se añaden
        mainCardContainer.add(panelMenu, "Menu");
        mainCardContainer.add(panelGame, "Juego");
@@ -26,12 +27,14 @@ public class POOBSoccerGUI extends JFrame {
        
        this.add(mainCardContainer);
     }
+
+    //Salir del juego
     private void exit(){
         int opcion= JOptionPane.showConfirmDialog(this,"¿Desea cerrar POOBSoccer?","Salir",JOptionPane.YES_NO_OPTION);
         if (opcion==JOptionPane.YES_OPTION){
             System.exit(0);
         }
-    }
+    }   
     
 
     private void prepareController(){
@@ -44,11 +47,13 @@ public class POOBSoccerGUI extends JFrame {
         });
             
     }
+    
     public static void main(String[] var0) {
         POOBSoccerGUI var1 = new POOBSoccerGUI();
         var1.prepareView();
         var1.prepareController();
     }
+
     private void prepareView() {
         Dimension var1 = Toolkit.getDefaultToolkit().getScreenSize();
         int var2 = var1.width / 2;

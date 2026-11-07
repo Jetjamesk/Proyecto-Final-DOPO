@@ -1,4 +1,4 @@
-package presentation;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,7 +17,8 @@ public class MenuGUI extends JPanel{
 
         btnDemoPlay = new JButton("Play");
 
-        btnDemoPlay.addActionListener(e -> cardLayout.show(mainCardContainer, "Juego"));
+        btnDemoPlay.addActionListener(e -> cardLayout.show(mainCardContainer, "OptionGames"));
+        
 
         this.add(btnDemoPlay);
 

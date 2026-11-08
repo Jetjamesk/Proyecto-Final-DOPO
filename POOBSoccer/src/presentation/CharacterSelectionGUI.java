@@ -17,6 +17,7 @@ public class CharacterSelectionGUI extends JPanel {
     private GameGUI gameGUI;
     private JPanel mainContainer;
     private CardLayout cardLayout;
+    private Image imgStart;
 
     private JLabel p1Preview;
     private JLabel p2Preview;
@@ -80,11 +81,14 @@ public class CharacterSelectionGUI extends JPanel {
         });
 
         // Play Button
-        JButton btnStart = new JButton("¡JUGAR!");
-        btnStart.setFont(new Font("SansSerif", Font.BOLD, 24));
-        btnStart.setBackground(new Color(46, 204, 113));
-        btnStart.setForeground(Color.WHITE);
-        btnStart.setFocusable(false);
+        java.net.URL url1 = getClass().getResource("images/startGame.png");
+        ImageIcon iconStart = (url1 != null) ? new ImageIcon(url1) : new ImageIcon();
+        imgStart = iconStart.getImage();
+        JButton btnStart = new JButton(iconStart);
+        btnStart.setBorderPainted(false);       
+        btnStart.setContentAreaFilled(false);   
+        btnStart.setFocusPainted(false);        
+        btnStart.setOpaque(false);              
         btnStart.addActionListener(e -> {
             Character player1 = instantiateCharacter(AVAILABLE_CHARACTERS[p1Index]);
             Character player2 = instantiateCharacter(AVAILABLE_CHARACTERS[p2Index]);

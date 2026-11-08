@@ -57,7 +57,7 @@ public class GameGUI extends JPanel {
 
         // Botón para regresar al menú
         JButton btnVolver = new JButton("Volver al Menú");
-        btnVolver.setBounds(10, 10, 150, 30);
+        btnVolver.setBounds(10, 40, 150, 30);
         btnVolver.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnVolver.setFocusable(false);              // si no, el botón le quita las teclas al panel
         btnVolver.addActionListener(e -> {

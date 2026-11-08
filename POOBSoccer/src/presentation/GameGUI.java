@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GameGUI extends JPanel {
+    private static final int KEY_RIGHT_CTRL = -9999;
     private static final Color[] TEAM_COLORS = { new Color(30, 90, 200), new Color(200, 40, 40) };
     private static final double HEAD_SCALE = 1.15;         // tamaño de la cara respecto a la hitbox 
     private static final boolean FACE_LOOKS_RIGHT = false; //Para la cara del muñeco de la izquierda 
@@ -31,6 +32,14 @@ public class GameGUI extends JPanel {
     private Image image;
     private final Map<String, Image> faces = new HashMap<>();   // país -> imagen de la cara
     private long lastNanos; //Con él se calcula cuánto tiempo pasó entre un tick y el siguiente, para que el juego se mueva a la misma velocidad
+    private Character player1 = new Canada();
+    private Character player2 = new Brasil();
+
+    public void setPlayers(Character p1, Character p2) {
+        this.player1 = p1;
+        this.player2 = p2;
+        startMatch();
+    }
 
     // Recibimos el mazo y el layout para poder volver al menú
     public GameGUI(JPanel mainCardContainer, CardLayout cardLayout) {
@@ -60,41 +69,48 @@ public class GameGUI extends JPanel {
         timer = new Timer(16, e -> tick());
 
         this.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentShown(ComponentEvent e) {
-                // Cada vez que entras: partido nuevo y el reloj arranca
-                startMatch();
-                timer.start();
-                requestFocusInWindow();
-            }
-
-            @Override
-            public void componentHidden(ComponentEvent e) {
-                // Al salir al menú el juego se detiene
-                timer.stop();
-                pressed.clear();
-            }
-        });
-
-        this.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                // add() devuelve false si la tecla ya estaba (repetición al mantenerla)
-                if (pressed.add(e.getKeyCode()) && e.getKeyCode() == KeyEvent.VK_P) {
-                    togglePause();
+                @Override
+                public void componentShown(ComponentEvent e) {
+                    startMatch();
+                    timer.start();
+                    requestFocusInWindow();
                 }
-            }
+            
+                @Override
+                public void componentHidden(ComponentEvent e) {
+                    timer.stop();
+                    pressed.clear();
+                }
+            });
 
-            @Override
-            public void keyReleased(KeyEvent e) {
-                pressed.remove(e.getKeyCode());
-            }
-        });
+            this.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    int key = getProcessedKey(e);
+                    if (pressed.add(key) && key == KeyEvent.VK_P) {
+                        togglePause();
+                    }
+                }
+            
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    int key = getProcessedKey(e);
+                    pressed.remove(key);
+                    pressed.remove(e.getKeyCode()); // Previene que la tecla quede trabada
+                }
+            
+                // Identifica si es específicamente el Control Derecho
+                private int getProcessedKey(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_CONTROL && e.getKeyLocation() == KeyEvent.KEY_LOCATION_RIGHT) {
+                        return KEY_RIGHT_CTRL;
+                    }
+                    return e.getKeyCode();
+                }
+            });
     }
-        //Inicia el partido. OJO ESTA CON DOS PAISES YA PREDETERMIANDOS
-        // HACE FALTA HACER QUE INICIE CUANDO SE HAYAN ESCOGIDO DOS PAISES PARA P1 y P2
+
     private void startMatch() {
-        match = new Match(new Canada(), new Brasil(), new Field(1000, 600, 180), new Ball(0, 0));
+        match = new Match(player1, player2, new Field(1000, 600, 180), new Ball(0, 0));
         faces.clear();
         for (int i = 0; i < 2; i++) {
             String country = match.getPlayer(i).getCountry();
@@ -156,21 +172,22 @@ public class GameGUI extends JPanel {
      *  Jugador 2: flechas. 
      */
     private void readKeys() {
-        control(0, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_W, KeyEvent.VK_S);
-        control(1, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_UP, KeyEvent.VK_DOWN);
+        control(0, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_Q);
+        control(1, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KEY_RIGHT_CTRL);
     }
 
     /**
      * Traduce las teclas presionadas de un jugador en órdenes para su personaje.
      */
 
-    private void control(int player, int left, int right, int up, int kick) {
+    private void control(int player, int left, int right, int up, int kick, int superKey) {
         int dir = 0;
         if (pressed.contains(left)) dir--;
         if (pressed.contains(right)) dir++;
         match.move(player, dir);
         if (pressed.contains(up)) match.jump(player);
         if (pressed.contains(kick)) match.kick(player);
+        if (pressed.contains(superKey)) match.useSuper(player);
     }
 
     @Override
@@ -290,10 +307,20 @@ public class GameGUI extends JPanel {
         // país sobre la cabeza
         g2d.setFont(new Font("SansSerif", Font.BOLD, 16));
         drawCentered(g2d, c.getCountry(), cx, cy - (int) (r * HEAD_SCALE) - 6, Color.WHITE);
+        g2d.setColor(team.darker().darker());
+        g2d.setStroke(new BasicStroke((float) (14 * c.getScale()), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2d.drawLine(cx, (int) c.getHipY(), (int) c.getFootX(), (int) (c.getFootY() - 14 * c.getScale()));
+        g2d.setStroke(new BasicStroke(1));
     }
 
     /** Dibuja la bota con la suela apoyada en el suelo, al patear la punta sube. */
     private void drawBoot(Graphics2D g2d, Character c, Color team) {
+        Graphics2D b = (Graphics2D) g2d.create();
+        b.translate(c.getFootX(), c.getFootY());
+        // Multiply BOOT_SCALE by c.getScale() so the boot shrinks with the character:
+        double finalScale = BOOT_SCALE * c.getScale();
+        b.scale(c.getFacing() * finalScale, finalScale);
+        b.rotate(-c.getFootTilt());
         Path2D boot = new Path2D.Double();
         boot.moveTo(-24, -26);              // parte de atrás de la caña
         boot.lineTo(-2, -26);               // parte de adelante de la caña
@@ -302,9 +329,6 @@ public class GameGUI extends JPanel {
         boot.quadTo(23, 0, 16, 0);          // puntera hasta la suela
         boot.lineTo(-24, 0);                // suela
         boot.closePath();
-
-        Graphics2D b = (Graphics2D) g2d.create();
-        b.translate(c.getFootX(), c.getFootY());
         b.scale(c.getFacing() * BOOT_SCALE, BOOT_SCALE);   // espejo si mira a la izquierda
         b.rotate(-c.getFootTilt());         // la punta se levanta al patear
         b.setColor(team.darker());
@@ -344,8 +368,49 @@ public class GameGUI extends JPanel {
         g2d.setFont(new Font("SansSerif", Font.BOLD, 20));
         String tiempo = match.isGoldenGoal() ? "GOL DE ORO" : String.valueOf((int) Math.ceil(match.getTimeLeft())) + " s";
         drawCentered(g2d, tiempo, w / 2, 64, new Color(255, 215, 0));
+        
+        //superbars
+        drawSuperBar(g2d, match.getPlayer(0), 40, 20, "SUPER [Q]");
+        drawSuperBar(g2d, match.getPlayer(1), w - 180, 20, "SUPER [CTRL-DER]");
+        for (int i=0; i<2; i++){
+            Character p = match.getPlayer(i);
+            if (p.isInverted()) {
+                g2d.setFont(new Font("SansSerif", Font.BOLD, 13));
+                drawCentered(g2d, "INVERTIDO", (int) p.getX(), (int) (p.getY() - p.getRadius() * HEAD_SCALE - 24), Color.YELLOW);
+            } else if (p.isShrink()) {
+                g2d.setFont(new Font("SansSerif", Font.BOLD, 13));
+                drawCentered(g2d, "ENCOGIDO", (int) p.getX(), (int) (p.getY() - p.getRadius() * HEAD_SCALE - 24), Color.MAGENTA);
+            }
+        }
     }
 
+    private void drawSuperBar(Graphics2D g2d, Character c, int x, int y, String label) {
+        int barW = 140;
+        int barH = 14;
+        double progress = Math.min(1.0, c.getSuperTimer() / Character.SUPER_COOLDOWN);
+    
+        // Fondo gris
+        g2d.setColor(new Color(40, 40, 40, 200));
+        g2d.fillRoundRect(x, y + 16, barW, barH, 6, 6);
+    
+        // Barra de progreso (Oro si está lista, azul/cian cargando)
+        if (c.isSuperReady()) {
+            g2d.setColor(new Color(255, 215, 0));
+        } else {
+            g2d.setColor(new Color(0, 180, 255));
+        }
+        g2d.fillRoundRect(x, y + 16, (int) (barW * progress), barH, 6, 6);
+    
+        // Borde
+        g2d.setColor(Color.WHITE);
+        g2d.setStroke(new BasicStroke(1.5f));
+        g2d.drawRoundRect(x, y + 16, barW, barH, 6, 6);
+    
+        // Texto de la barra
+        g2d.setFont(new Font("SansSerif", Font.BOLD, 12));
+        String text = c.isSuperReady() ? label + " (¡LISTO!)" : label + " (" + (int)(progress * 100) + "%)";
+        g2d.drawString(text, x, y + 12);
+    }
 
     /**
      * Mensajes del partido ("Gano el partido ...., Gol de oro")
@@ -375,4 +440,5 @@ public class GameGUI extends JPanel {
         g2d.drawString(text, cx - w / 2, baselineY);
     }
 
+    
 }

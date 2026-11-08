@@ -62,7 +62,7 @@ public class OptionGamesGUI extends JPanel {
         button3.setOpaque(false);              
         button3.addActionListener(null);
 
-        button1.addActionListener(e -> cardLayout.show(mainCardContainer, "Juego"));
+        button1.addActionListener(e -> cardLayout.show(mainCardContainer, "SelectCharacter"));;
 
         this.add(button1);
         this.add(button2);

@@ -1,6 +1,7 @@
 package domain;
 
 public abstract class Character {
+    
     private static final double GRAVITY = 2500.0;      
     private static final double RADIUS = 45;          // la cabeza
     private static final double GAP = 30;             // la cabeza flota sobre el suelo para poner el pie 
@@ -9,6 +10,14 @@ public abstract class Character {
     private static final double REST_ANGLE = 0.6;     // pie en reposo (Derecho no tiene ningun movimiento)
     private static final double KICK_ANGLE = 2.0;     // pie en lo más alto de la patada (adelante y arriba)
 
+    //medidas para el super y efectos
+    public static final double SUPER_COOLDOWN = 10.0; // Tiempo de cooldown del super
+    private double superTimer = 20.0;   //Tiempo de activacion del super
+    private double invertTimer = 0.0;   //Tiempo de inversion de controles
+    private double shrinkTimer = 0.0;   //Tiempo de encogimiento del personaje
+    private double scale = 1.0;         // Escala del personaje(actual)
+
+    //Movimiento de pies y cabeza
     private double x, y;                // centro de la cabeza
     private double vx, vy;      
     private double startX;
@@ -35,7 +44,11 @@ public abstract class Character {
 
     /** Orden de movimiento: -1 izquierda, 0 quieto, 1 derecha. */
     public void movement(int direction){
-        this.direction = Integer.signum(direction);
+        int dir = Integer.signum(direction);
+        if (invertTimer > 0){
+            dir = -dir;
+        }
+        this.direction = dir;
     }
 
     /**
@@ -55,10 +68,54 @@ public abstract class Character {
         if (kickTimer <= 0) kickTimer = kickDuration;
     }
 
+    public void activateSuper(Character rival) {
+        if (isSuperReady()) {
+            superTimer = 0.0;
+            usarPoder(rival);
+        }
+    }
+    /**
+     * Analiza si el personaje puede aplicar o no el super
+     * @return si el tiempo del super ya paso o no
+     */
+    public boolean isSuperReady() {
+        return superTimer >= SUPER_COOLDOWN;
+    }
+
+    /**
+     * Invierte los controles del rival por una duraccion dada  
+     * 
+     */ 
+    public void applyInvertControls(double duration) {
+        this.invertTimer = duration;
+    }
+
+    /**
+     * Aplica el efecto de encogimiento
+     * @param factor Por cuanto se disminuira o aumentara el tamaño del personaje
+     * @param duration Cuanto durara este efecto
+     */
+    public void applyShrink(double factor, double duration){
+        this.scale = factor;
+        this.shrinkTimer = duration;
+    }
+
     /**
      *  Física del personaje: avanza dt segundos.
      */
     public void update(double dt, Field field){
+        if (superTimer < SUPER_COOLDOWN) {
+            superTimer = Math.min(SUPER_COOLDOWN, superTimer + dt);
+        }
+        if (invertTimer > 0) {
+            invertTimer = Math.max(0, invertTimer - dt);
+        }
+        if (shrinkTimer > 0) {
+            shrinkTimer = Math.max(0, shrinkTimer - dt);
+            if (shrinkTimer == 0) {
+                scale = 1.0; // Vuelve a su tamaño normal
+            }
+        }
         vx = direction * (180 + 60 * speed);
         vy += GRAVITY * dt;
         x += vx * dt;
@@ -120,7 +177,7 @@ public abstract class Character {
     /**
      * Es una clase abstracta o una interfaz ??
      */
-    public abstract void usarPoder();
+    public abstract void usarPoder(Character rival);
 
     public int getScore(){
         return score;
@@ -186,5 +243,19 @@ public abstract class Character {
     public double getFootTilt(){
         return footTilt;
     }
+    public double getScale() { 
+        return scale; 
+    }
 
+    public double getSuperTimer(){
+        return superTimer;
+    }
+
+    public boolean isInverted() { 
+        return invertTimer > 0; 
+    }
+
+    public boolean isShrink(){
+        return shrinkTimer > 0;
+    }
 }

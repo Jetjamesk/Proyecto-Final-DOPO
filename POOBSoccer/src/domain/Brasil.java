@@ -7,7 +7,7 @@ public class Brasil extends Character {
     }
 
     @Override
-    public void usarPoder(){
-        // Poder de Brasil: pendiente (etapa de poderes)
+    public void usarPoder(Character rival){
+        rival.applyInvertControls(5.5);
     }
 }

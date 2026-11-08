@@ -17,12 +17,14 @@ public class POOBSoccerGUI extends JFrame {
        //De esta manera se guardaran los panels, imaginalo como un mazo de cartas. Los instanciamos y los vamos colocando
        //De manera que los botones son redirigan al siguiente Panel y adaptamos los botones y tal
        MenuGUI panelMenu = new MenuGUI(mainCardContainer, cardLayout);
-       //OptionGamesGUI panelOptionGames = new OptionGamesGUI(mainCardContainer, cardLayout);
+       
        GameGUI panelGame = new GameGUI(mainCardContainer, cardLayout);
        OptionGamesGUI panelOptionGames = new OptionGamesGUI(mainCardContainer, cardLayout);
+       CharacterSelectionGUI panelSelection = new CharacterSelectionGUI(mainCardContainer, cardLayout, panelGame);
        //Aqui se añaden
        mainCardContainer.add(panelMenu, "Menu");
        mainCardContainer.add(panelOptionGames, "OptionGames");
+       mainCardContainer.add(panelSelection, "SelectCharacter");
        mainCardContainer.add(panelGame, "Juego");
        //Aqui mostramos el primero y como mostrarlos en general
        cardLayout.show(mainCardContainer, "Menu");

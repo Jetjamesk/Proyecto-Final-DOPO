@@ -7,7 +7,7 @@ public class Canada extends Character {
     }
 
     @Override
-    public void usarPoder(){
-        //Poder de poder
+    public void usarPoder(Character rival){
+        rival.applyShrink(0.5,6.0);
     }
 }

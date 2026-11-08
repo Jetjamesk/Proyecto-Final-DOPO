@@ -58,6 +58,9 @@ public class Match {
         checkGoal();
     }
 
+    /**
+     * Verifica los goles hayan sido hechos
+     */
     public void checkGoal(){
         int conceded = field.goalConcededBy(ball);   // 0 = arco izquierdo, 1 = derecho
         if (conceded < 0) return;
@@ -67,6 +70,18 @@ public class Match {
             endMatch();
         } else {
             resetRound();
+        }
+    }
+
+    /**
+     * usar el super 
+     * @param player que jugador usara el super, si es 1 sera el  izquierdo si es 2 sera el derecho
+     */
+    public void useSuper(int player){
+        if (isRunning && !isPaused) {
+            Character user = jugadores.get(player);
+            Character rival = jugadores.get(1 - player);
+            user.activateSuper(rival);
         }
     }
 

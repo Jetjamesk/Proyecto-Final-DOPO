@@ -3,11 +3,17 @@
 import javax.swing.*;
 import java.awt.*;
 
-public class MenuGUI extends JPanel{
-    private Image backgroundImage;
-    private JButton btnDemoPlay;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-    public MenuGUI(JPanel mainCardContainer, CardLayout cardLayout){
+public class MenuGUI extends JPanel {
+    private Image backgroundImage;
+    private final Timer blinkTimer;
+    private boolean showText = true;
+
+    public MenuGUI(JPanel mainCardContainer, CardLayout cardLayout) {
         java.net.URL url = getClass().getResource("/images/Menu.jpg");
         if (url != null) {
             backgroundImage = new ImageIcon(url).getImage();
@@ -15,43 +21,69 @@ public class MenuGUI extends JPanel{
             System.err.println("No se encontró la imagen");
         }
 
-        btnDemoPlay = new JButton("Play");
+        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        btnDemoPlay.addActionListener(e -> cardLayout.show(mainCardContainer, "OptionGames"));
-        
+        // Al hacer clic en cualquier parte, avanza al siguiente menú
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                cardLayout.show(mainCardContainer, "OptionGames");
+            }
+        });
 
-        this.add(btnDemoPlay);
+        // Timer que alterna la visibilidad del texto cada 500 ms (efecto arcade)
+        blinkTimer = new Timer(500, e -> {
+            showText = !showText;
+            repaint();
+        });
 
+        // El timer solo corre cuando el menú está en pantalla (ahorra CPU)
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                showText = true;
+                blinkTimer.start();
+            }
+
+            @Override
+            public void componentHidden(ComponentEvent e) {
+                blinkTimer.stop();
+            }
+        });
     }
 
-    /**
-     * Se usa para poner la imagen en el menu
-     */
     @Override 
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        // 1) Fondo
         if (backgroundImage != null) {
             g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
         }
+
+        // 2) Texto parpadeante
+        if (showText) {
+            Graphics2D g2d = (Graphics2D) g.create();
+            g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+            String text = "¡ Toca para jugar ! ";
+            Font font = new Font("Wide Latin", Font.ROMAN_BASELINE, 30);
+            g2d.setFont(font);
+
+            FontMetrics fm = g2d.getFontMetrics();
+            int textW = fm.stringWidth(text);
+            int x = (getWidth() - textW) / 2;             // Centrado horizontal
+            int y = (int) (getHeight() * 0.85);            // 85% de la altura de la pantalla
+
+            // Sombra negra para que siempre sea legible sin importar los colores del fondo
+            g2d.setColor(new Color(0, 0, 0, 180));
+            g2d.drawString(text, x + 2, y + 2);
+
+            // Texto frontal blanco/dorado
+            g2d.setColor(Color.WHITE);
+            g2d.drawString(text, x, y);
+
+            g2d.dispose();
+        }
     }
-
-    /**
-     * Se usa para que el boton jugar quede en una posicion
-     */
-    @Override
-    public void doLayout() {
-        super.doLayout();
-        int w = getWidth();
-        int h = getHeight();
-
-        int bw = (int) (w * 0.31);  // ancho
-        int bh = (int) (h * 0.09);  // alto
-        int x = (int) (w - bw) / 2;   // distacia para que quede centrado 
-        int y = (int) (h * 0.85);   // distancia desde arriba (sube o baja aquí)
-        
-
-        btnDemoPlay.setBounds(x, y, bw, bh);
-    }
-
 }

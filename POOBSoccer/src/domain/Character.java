@@ -1,14 +1,22 @@
 package domain;
 
 public abstract class Character {
+
+    //Valores base para el encogimiento
+    private static final double BASE_RADIUS = 45;       // Cabeza
+    private static final double BASE_GAP = 30;          // Separación del suelo
+    private static final double BASE_FOOT_RADIUS = 18;  // Pie (hitbox)
+    private static final double BASE_LEG = 55;          // Pierna
+
     
     private static final double GRAVITY = 2500.0;      
     private static final double RADIUS = 45;          // la cabeza
     private static final double GAP = 30;             // la cabeza flota sobre el suelo para poner el pie 
-    private static final double FOOT_RADIUS = 18;     // El pie  
     private static final double LEG = 55;             // largo de la pierna (La conexion entre la cabeza y el pie)
     private static final double REST_ANGLE = 0.6;     // pie en reposo (Derecho no tiene ningun movimiento)
-    private static final double KICK_ANGLE = 2.0;     // pie en lo más alto de la patada (adelante y arriba)
+    private static final double KICK_ANGLE = 2.0;   // pie en lo más alto de la patada (adelante y arriba)
+    private double headScale = 1.0;
+
 
     //medidas para el super y efectos
     public static final double SUPER_COOLDOWN = 10.0; // Tiempo de cooldown del super
@@ -95,51 +103,65 @@ public abstract class Character {
      * @param factor Por cuanto se disminuira o aumentara el tamaño del personaje
      * @param duration Cuanto durara este efecto
      */
-    public void applyShrink(double factor, double duration){
-        this.scale = factor;
+    public void applyShrink(double factor, double duration) {
+        this.scale = factor;        // Por ejemplo 0.5 para reducir a la mitad
         this.shrinkTimer = duration;
     }
+    
+
 
     /**
      *  Física del personaje: avanza dt segundos.
      */
-    public void update(double dt, Field field){
-        if (superTimer < SUPER_COOLDOWN) {
-            superTimer = Math.min(SUPER_COOLDOWN, superTimer + dt);
-        }
-        if (invertTimer > 0) {
-            invertTimer = Math.max(0, invertTimer - dt);
-        }
+    public void update(double dt, Field field) {
+        // 1. Temporizador del encogimiento
         if (shrinkTimer > 0) {
             shrinkTimer = Math.max(0, shrinkTimer - dt);
             if (shrinkTimer == 0) {
                 scale = 1.0; // Vuelve a su tamaño normal
             }
         }
+        if (invertTimer > 0) {
+            invertTimer = Math.max(0, invertTimer - dt);
+        }
+        
+    
+        // 2. Física adaptada al tamaño actual
         vx = direction * (180 + 60 * speed);
         vy += GRAVITY * dt;
         x += vx * dt;
         y += vy * dt;
-        x = Math.max(RADIUS, Math.min(x, field.getWidth() - RADIUS));
-        double floorCenter = field.getFloorY() - RADIUS - GAP;
+    
+        double r = getRadius();
+        x = Math.max(r, Math.min(x, field.getWidth() - r));
+    
+        // Altura del suelo ajustada al tamaño
+        double floorCenter = field.getFloorY() - r - (BASE_GAP * scale);
         if (y >= floorCenter) {
             y = floorCenter;
             vy = 0;
             onGround = true;
         }
+    
         if (kickTimer > 0) kickTimer = Math.max(0, kickTimer - dt);
         updateFoot(dt, field);
+        if (superTimer < SUPER_COOLDOWN) {
+            superTimer = Math.min(SUPER_COOLDOWN, superTimer + dt);
+        }
     }
 
     /** 
      * Coloca el pie según el avance de la patada y calcula su velocidad. 
     */
-    private void updateFoot(double dt, Field field){
-        double progress = kickTimer > 0 ? 1 - kickTimer / kickDuration : 0;   // 0 → 1
-        double angle = REST_ANGLE + (KICK_ANGLE - REST_ANGLE) * Math.sin(Math.PI * progress);  // sube y vuelve
+    private void updateFoot(double dt, Field field) {
+        double progress = kickTimer > 0 ? 1 - kickTimer / kickDuration : 0;
+        double angle = REST_ANGLE + (KICK_ANGLE - REST_ANGLE) * Math.sin(Math.PI * progress);
         footTilt = angle - REST_ANGLE;
-        double newX = x + facing * LEG * Math.sin(angle);
-        double newY = Math.min(getHipY() + LEG * Math.cos(angle), field.getFloorY());          // no baja del suelo
+    
+        double currentLeg = BASE_LEG * scale;
+        double newX = x + facing * currentLeg * Math.sin(angle);
+        double newY = Math.min(getHipY() + currentLeg * Math.cos(angle), field.getFloorY());
+    
         if (dt > 0) {
             footVx = (newX - footX) / dt;
             footVy = (newY - footY) / dt;
@@ -155,6 +177,9 @@ public abstract class Character {
      * Vuelve a su posición inicial (después de un gol o al empezar). 
     */
     public void reset(Field field){
+        invertTimer = 0.0;
+        scale = 1.0;
+        shrinkTimer = 0.0;
         x = startX;
         y = field.getFloorY() - RADIUS - GAP;
         vx = 0;
@@ -162,6 +187,7 @@ public abstract class Character {
         direction = 0;
         onGround = true;
         kickTimer = 0;
+        headScale = 1.0;
         updateFoot(0, field);
     }
 
@@ -207,17 +233,13 @@ public abstract class Character {
         return vy;
     }
 
-    public double getRadius(){
-        return RADIUS;
-    }
-
     public int getFacing(){
         return facing;
     }
 
     /** Altura de la cadera: donde la pierna se une a la cabeza. */
-    public double getHipY(){
-        return y + RADIUS - 5;
+    public double getHipY() {
+        return y + getRadius() - (5 * scale);
     }
 
     public double getFootX(){
@@ -236,16 +258,24 @@ public abstract class Character {
         return footVy;
     }
 
-    public double getFootRadius(){
-        return FOOT_RADIUS;
+    public double getFootRadius() {
+        return BASE_FOOT_RADIUS * scale;
     }
+    
+
 
     public double getFootTilt(){
         return footTilt;
     }
-    public double getScale() { 
-        return scale; 
+    public double getScale() {
+        return scale;
     }
+    
+
+    public double getRadius() {
+        return BASE_RADIUS * scale;
+    }
+    
 
     public double getSuperTimer(){
         return superTimer;

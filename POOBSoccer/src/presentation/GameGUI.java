@@ -309,7 +309,6 @@ public class GameGUI extends JPanel {
         drawCentered(g2d, c.getCountry(), cx, cy - (int) (r * HEAD_SCALE) - 6, Color.WHITE);
         g2d.setColor(team.darker().darker());
         g2d.setStroke(new BasicStroke((float) (14 * c.getScale()), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g2d.drawLine(cx, (int) c.getHipY(), (int) c.getFootX(), (int) (c.getFootY() - 14 * c.getScale()));
         g2d.setStroke(new BasicStroke(1));
     }
 
@@ -317,23 +316,21 @@ public class GameGUI extends JPanel {
     private void drawBoot(Graphics2D g2d, Character c, Color team) {
         Graphics2D b = (Graphics2D) g2d.create();
         b.translate(c.getFootX(), c.getFootY());
-        // Multiply BOOT_SCALE by c.getScale() so the boot shrinks with the character:
         double finalScale = BOOT_SCALE * c.getScale();
         b.scale(c.getFacing() * finalScale, finalScale);
         b.rotate(-c.getFootTilt());
+    
         Path2D boot = new Path2D.Double();
-        boot.moveTo(-24, -26);              // parte de atrás de la caña
-        boot.lineTo(-2, -26);               // parte de adelante de la caña
-        boot.lineTo(0, -14);                // empeine
-        boot.quadTo(20, -14, 22, -4);       // sube la punta
-        boot.quadTo(23, 0, 16, 0);          // puntera hasta la suela
-        boot.lineTo(-24, 0);                // suela
-        boot.closePath();
-        b.scale(c.getFacing() * BOOT_SCALE, BOOT_SCALE);   // espejo si mira a la izquierda
-        b.rotate(-c.getFootTilt());         // la punta se levanta al patear
+        boot.moveTo(-24, -26);
+        boot.lineTo(-2, -26);
+        boot.lineTo(0, -14);
+        boot.quadTo(20, -14, 22, -4);
+        boot.quadTo(23, 0, 16, 0);
+        boot.lineTo(-24, 0);
+        boot.closePath();    
         b.setColor(team.darker());
         b.fill(boot);
-        b.setColor(Color.WHITE);            // franja de la suela
+        b.setColor(Color.WHITE);
         b.setStroke(new BasicStroke(3));
         b.drawLine(-22, -3, 16, -3);
         b.setColor(Color.BLACK);
@@ -372,6 +369,7 @@ public class GameGUI extends JPanel {
         //superbars
         drawSuperBar(g2d, match.getPlayer(0), 40, 20, "SUPER [Q]");
         drawSuperBar(g2d, match.getPlayer(1), w - 180, 20, "SUPER [CTRL-DER]");
+        //Super affections being drawn
         for (int i=0; i<2; i++){
             Character p = match.getPlayer(i);
             if (p.isInverted()) {

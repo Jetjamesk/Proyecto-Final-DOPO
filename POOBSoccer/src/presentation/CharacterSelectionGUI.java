@@ -1,3 +1,5 @@
+package presentation;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -41,14 +43,31 @@ public class CharacterSelectionGUI extends JPanel {
     private void buildUI() {
         // Back Button
         JButton btnBack = new JButton("Volver");
+        btnBack.setFont(new Font("Wide Latin", Font.ROMAN_BASELINE, 15));
+        btnBack.setForeground(Color.white);
+        btnBack.setBackground(new Color(20,20,20));
         btnBack.setBounds(20, 20, 120, 35);
         btnBack.setFocusable(false);
+        btnBack.setBorderPainted(false);
         btnBack.addActionListener(e -> cardLayout.show(mainContainer, "OptionGames"));
         this.add(btnBack);
 
         // Player 1 Selector Components
         JButton p1Prev = new JButton("<");
+        //Estilo 
+        p1Prev.setFont(new Font("Wide Latin", Font.ROMAN_BASELINE,15));
+        p1Prev.setForeground(Color.white);
+        p1Prev.setBackground(new Color(20,20,20));
+        p1Prev.setBorderPainted(false);
+
         JButton p1Next = new JButton(">");
+        //Estilo 
+        p1Next.setFont(new Font("Wide Latin", Font.ROMAN_BASELINE,15));
+        p1Next.setForeground(Color.white);
+        p1Next.setBackground(new Color(20,20,20));
+        p1Next.setBorderPainted(false);
+    
+        
         p1NameLabel = new JLabel("", SwingConstants.CENTER);
         p1NameLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
         p1NameLabel.setForeground(Color.WHITE);
@@ -65,7 +84,18 @@ public class CharacterSelectionGUI extends JPanel {
 
         // Player 2 Selector Components
         JButton p2Prev = new JButton("<");
+        //Estilo
+        p2Prev.setFont(new Font("Wide Latin", Font.ROMAN_BASELINE,15));
+        p2Prev.setForeground(Color.white);
+        p2Prev.setBackground(new Color(20,20,20));
+        p2Prev.setBorderPainted(false);
+
         JButton p2Next = new JButton(">");
+        //Estilo
+        p2Next.setFont(new Font("Wide Latin",Font.ROMAN_BASELINE,15));
+        p2Next.setForeground(Color.white);
+        p2Next.setBackground(new Color(20,20,20));
+        p2Next.setBorderPainted(false);
         p2NameLabel = new JLabel("", SwingConstants.CENTER);
         p2NameLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
         p2NameLabel.setForeground(Color.WHITE);
@@ -81,7 +111,7 @@ public class CharacterSelectionGUI extends JPanel {
         });
 
         // Play Button
-        java.net.URL url1 = getClass().getResource("images/startGame.png");
+        java.net.URL url1 = getClass().getResource("/images/startGame.png");
         ImageIcon iconStart = (url1 != null) ? new ImageIcon(url1) : new ImageIcon();
         imgStart = iconStart.getImage();
         JButton btnStart = new JButton(iconStart);

@@ -4,6 +4,7 @@ public class Ball {
     private static final double RADIUS = 20; // Tamaño del balon
     private double x, y;
     private double vx, vy;
+    
 
     //Game physics
     private static final double GRAVITY = 2500.0;

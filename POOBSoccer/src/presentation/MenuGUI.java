@@ -1,4 +1,4 @@
-
+package presentation;
 
 import javax.swing.*;
 import java.awt.*;
@@ -79,7 +79,7 @@ public class MenuGUI extends JPanel {
             g2d.setColor(new Color(0, 0, 0, 180));
             g2d.drawString(text, x + 2, y + 2);
 
-            // Texto frontal blanco/dorado
+            // Texto frontal blanco
             g2d.setColor(Color.WHITE);
             g2d.drawString(text, x, y);
 

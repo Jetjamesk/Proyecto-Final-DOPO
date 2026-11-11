@@ -8,6 +8,6 @@ public class Brasil extends Character {
 
     @Override
     public void usarPoder(Character rival){
-        rival.applyInvertControls(5.5);
+        rival.applyInvertControls(6);
     }
 }

@@ -74,10 +74,10 @@ public class Match {
     }
 
     /**
-     * usar el super 
-     * @param player que jugador usara el super, si es 1 sera el  izquierdo si es 2 sera el derecho
+     * usar el poder sobre el rival
+     * @param player que jugador usara el poder. 
      */
-    public void useSuper(int player){
+    public void usePower(int player){
         if (isRunning && !isPaused) {
             Character user = jugadores.get(player);
             Character rival = jugadores.get(1 - player);
@@ -94,13 +94,20 @@ public class Match {
         }
     }
 
-    /** Personajes y balón vuelven al inicio; el balón cae desde el centro. */
+    /**
+     * Reinicia a lso juagdores y el balon a la posicion inicial.
+     */
     private void resetRound(){
-        for (Character p : jugadores) p.reset(field);
+        for (Character p : jugadores){
+            p.reset(field);
+        } 
         ball.reset(field.getWidth() / 2.0, field.getHeight() * 0.25);
     }
 
-    // ---- órdenes de los jugadores (la GUI las llama según las teclas) ----
+    /**
+     * Ordenes que los jugadores pueden tener
+     * 
+     */
     public void move(int player, int direction){
         if (isRunning && !isPaused) jugadores.get(player).movement(direction);
     }

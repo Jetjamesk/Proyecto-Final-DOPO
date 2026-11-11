@@ -1,4 +1,4 @@
-
+package presentation;
 
 import javax.swing.*;
 import java.awt.*;
@@ -60,8 +60,8 @@ public class POOBSoccerGUI extends JFrame {
 
     private void prepareView() {
         Dimension var1 = Toolkit.getDefaultToolkit().getScreenSize();
-        int var2 = var1.width / 2;
-        int var3 = var1.height / 2;
+        int var2 = var1.width /2;
+        int var3 = var1.height /2;
         this.setSize(var2, var3);
         Dimension var4 = this.getSize();
         int var5 = var4.width / 2;

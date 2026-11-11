@@ -1,4 +1,4 @@
-
+package presentation;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,6 +14,7 @@ import domain.Brasil;
 import domain.Character;
 import domain.Field;
 import domain.Match;
+import java.awt.image.BufferedImage;
 import java.awt.geom.Path2D;
 import java.text.Normalizer;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ public class GameGUI extends JPanel {
     private final Set<Integer> pressed = new HashSet<>();
     private Match match;
     private Image image;
+    private Image ballImage;
     private final Map<String, Image> faces = new HashMap<>();   // país -> imagen de la cara
     private long lastNanos; //Con él se calcula cuánto tiempo pasó entre un tick y el siguiente, para que el juego se mueva a la misma velocidad
     private Character player1 = new Canada();
@@ -43,11 +45,19 @@ public class GameGUI extends JPanel {
 
     // Recibimos el mazo y el layout para poder volver al menú
     public GameGUI(JPanel mainCardContainer, CardLayout cardLayout) {
+        //El fondo del juego
         java.net.URL url = getClass().getResource("/images/Background.jpg");
         if (url != null) {
             image = new ImageIcon(url).getImage();
         } else {
             System.err.println("No se encontró la imagen");
+        }
+        //El balon
+        java.net.URL Ballurl = getClass().getResource("/images/ball.png");
+        if (Ballurl != null){
+            ballImage = trimTransparent(new ImageIcon(Ballurl).getImage());
+        }else{
+            System.err.println("No se encontro la imagen");
         }
         this.setLayout(null);
         this.setBackground(Color.BLACK);
@@ -56,10 +66,8 @@ public class GameGUI extends JPanel {
         startMatch();
 
         // Botón para regresar al menú
-        JButton btnVolver = new JButton("Volver al Menú");
+        RoundButton btnVolver = new RoundButton("←");
         btnVolver.setBounds(10, 40, 150, 30);
-        btnVolver.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnVolver.setFocusable(false);              // si no, el botón le quita las teclas al panel
         btnVolver.addActionListener(e -> {
             cardLayout.show(mainCardContainer, "Menu");
         });
@@ -187,7 +195,7 @@ public class GameGUI extends JPanel {
         match.move(player, dir);
         if (pressed.contains(up)) match.jump(player);
         if (pressed.contains(kick)) match.kick(player);
-        if (pressed.contains(superKey)) match.useSuper(player);
+        if (pressed.contains(superKey)) match.usePower(player);
     }
 
     @Override
@@ -348,10 +356,19 @@ public class GameGUI extends JPanel {
         int d = (int) (ball.getRadius() * 2);
         int drawX = (int) (ball.getX() - ball.getRadius());
         int drawY = (int) (ball.getY() - ball.getRadius());
-        g2d.setColor(Color.WHITE);
-        g2d.fillOval(drawX, drawY, d, d);
-        g2d.setColor(Color.BLACK);
-        g2d.drawOval(drawX, drawY, d, d);
+
+        if (ballImage != null) {
+            double angle = ball.getX() / ball.getRadius();   // gira al moverse en X
+            Graphics2D b = (Graphics2D) g2d.create();
+            b.rotate(angle, ball.getX(), ball.getY());       // rota alrededor de su centro
+            b.drawImage(ballImage, drawX, drawY, d, d, this);
+            b.dispose();
+        } else {
+            g2d.setColor(Color.WHITE);
+            g2d.fillOval(drawX, drawY, d, d);
+            g2d.setColor(Color.BLACK);
+            g2d.drawOval(drawX, drawY, d, d);
+        }
     }
 
     private void drawHud(Graphics2D g2d, Field field) {
@@ -381,7 +398,7 @@ public class GameGUI extends JPanel {
             }
         }
     }
-
+    // BARRA DE PODERES
     private void drawSuperBar(Graphics2D g2d, Character c, int x, int y, String label) {
         int barW = 140;
         int barH = 14;
@@ -436,6 +453,33 @@ public class GameGUI extends JPanel {
         int w = g2d.getFontMetrics().stringWidth(text);
         g2d.setColor(color);
         g2d.drawString(text, cx - w / 2, baselineY);
+    }
+
+        /** Recorta los bordes transparentes para que la imagen coincida con el círculo real. */
+    private static Image trimTransparent(Image img) {
+        int w = img.getWidth(null);
+        int h = img.getHeight(null);
+        if (w <= 0 || h <= 0) return img;
+
+        BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = bi.createGraphics();
+        g.drawImage(img, 0, 0, null);
+        g.dispose();
+
+        int minX = w, minY = h, maxX = -1, maxY = -1;
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int alpha = (bi.getRGB(x, y) >>> 24) & 0xFF;
+                if (alpha > 20) {                       // píxel visible
+                    if (x < minX) minX = x;
+                    if (x > maxX) maxX = x;
+                    if (y < minY) minY = y;
+                    if (y > maxY) maxY = y;
+                }
+            }
+        }
+        if (maxX < 0) return img;                       // imagen totalmente transparente
+        return bi.getSubimage(minX, minY, maxX - minX + 1, maxY - minY + 1);
     }
 
     

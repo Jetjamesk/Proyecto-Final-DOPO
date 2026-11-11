@@ -1,4 +1,4 @@
-
+package presentation;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,9 +27,9 @@ public class OptionGamesGUI extends JPanel {
         }
         this.setLayout(null);
 
-        java.net.URL url1 = getClass().getResource("images/ArcadeButton.png");
-        java.net.URL url2 = getClass().getResource("images/MultiplayerButton.png");
-        java.net.URL url3 = getClass().getResource("images/RobotButton.png");
+        java.net.URL url1 = getClass().getResource("/images/ArcadeButton.png");
+        java.net.URL url2 = getClass().getResource("/images/MultiplayerButton.png");
+        java.net.URL url3 = getClass().getResource("/images/RobotButton.png");
 
         ImageIcon iconPvsP = (url1 != null) ? new ImageIcon(url1) : new ImageIcon(); 
         ImageIcon iconPvsM = (url2 != null) ? new ImageIcon(url2) : new ImageIcon();
@@ -62,11 +62,28 @@ public class OptionGamesGUI extends JPanel {
         button3.setOpaque(false);              
         button3.addActionListener(null);
 
+
+        JButton button4 = new JButton("Volver");
+        button4.setBounds(20, 20, 120, 35);
+        button4.setFocusable(false);
+        button4.addActionListener(e -> cardLayout.show(mainCardContainer, "Menu"));
+
+        //Estilo del bton de volver
+        button4.setFont(new Font("Wide Latin", Font.ROMAN_BASELINE, 15));
+        button4.setBackground(new Color(20,20,20));
+        button4.setForeground(Color.white);
+        button4.setBorderPainted(false);
+
+
         button1.addActionListener(e -> cardLayout.show(mainCardContainer, "SelectCharacter"));;
 
         this.add(button1);
         this.add(button2);
         this.add(button3);
+        this.add(button4);
+
+
+
     }
 
     /**

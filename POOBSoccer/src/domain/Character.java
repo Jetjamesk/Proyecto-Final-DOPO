@@ -3,14 +3,14 @@ package domain;
 public abstract class Character {
 
     //Valores base para el encogimiento
-    private static final double BASE_RADIUS = 45;       // Cabeza
+    private static final double BASE_RADIUS = 15;       // Cabeza CAMBIAR
     private static final double BASE_GAP = 30;          // Separación del suelo
     private static final double BASE_FOOT_RADIUS = 18;  // Pie (hitbox)
     private static final double BASE_LEG = 55;          // Pierna
 
     
     private static final double GRAVITY = 2500.0;      
-    private static final double RADIUS = 45;          // la cabeza
+    private static final double RADIUS = 35;          // la cabeza CAMBIAR 
     private static final double GAP = 30;             // la cabeza flota sobre el suelo para poner el pie 
     private static final double LEG = 55;             // largo de la pierna (La conexion entre la cabeza y el pie)
     private static final double REST_ANGLE = 0.6;     // pie en reposo (Derecho no tiene ningun movimiento)
@@ -93,7 +93,7 @@ public abstract class Character {
     /**
      * Invierte los controles del rival por una duraccion dada  
      * 
-     */ 
+     */
     public void applyInvertControls(double duration) {
         this.invertTimer = duration;
     }
@@ -273,7 +273,7 @@ public abstract class Character {
     
 
     public double getRadius() {
-        return BASE_RADIUS * scale;
+        return RADIUS * scale;
     }
     
 

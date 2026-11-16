@@ -1,6 +1,6 @@
 package domain;
 
-public abstract class Character {
+public abstract class Character extends Physics {
 
     //Valores base para el encogimiento
     private static final double BASE_RADIUS = 15;       // Cabeza CAMBIAR
@@ -9,7 +9,7 @@ public abstract class Character {
     private static final double BASE_LEG = 55;          // Pierna
 
     
-    private static final double GRAVITY = 2500.0;      
+    
     private static final double RADIUS = 35;          // la cabeza CAMBIAR 
     private static final double GAP = 30;             // la cabeza flota sobre el suelo para poner el pie 
     private static final double LEG = 55;             // largo de la pierna (La conexion entre la cabeza y el pie)
@@ -26,8 +26,7 @@ public abstract class Character {
     private double scale = 1.0;         // Escala del personaje(actual)
 
     //Movimiento de pies y cabeza
-    private double x, y;                // centro de la cabeza
-    private double vx, vy;      
+
     private double startX;
     private int direction;              // -1 izquierda, 0 quieto, 1 derecha
     private int facing = 1;             // hacia dónde mira: 1 derecha, -1 izquierda
@@ -114,7 +113,7 @@ public abstract class Character {
      *  Física del personaje: avanza dt segundos.
      */
     public void update(double dt, Field field) {
-        // 1. Temporizador del encogimiento
+        // 1. Temporizadores de los efectos
         if (shrinkTimer > 0) {
             shrinkTimer = Math.max(0, shrinkTimer - dt);
             if (shrinkTimer == 0) {
@@ -124,25 +123,17 @@ public abstract class Character {
         if (invertTimer > 0) {
             invertTimer = Math.max(0, invertTimer - dt);
         }
-        
-    
-        // 2. Física adaptada al tamaño actual
+
+        // 2. Física: gravedad y movimiento heredados de Physics
         vx = direction * (180 + 60 * speed);
-        vy += GRAVITY * dt;
-        x += vx * dt;
-        y += vy * dt;
-    
+        integrate(dt);
+
         double r = getRadius();
         x = Math.max(r, Math.min(x, field.getWidth() - r));
-    
-        // Altura del suelo ajustada al tamaño
         double floorCenter = field.getFloorY() - r - (BASE_GAP * scale);
-        if (y >= floorCenter) {
-            y = floorCenter;
-            vy = 0;
-            onGround = true;
-        }
-    
+        if (y >= floorCenter) { y = floorCenter; vy = 0; onGround = true; }
+
+        // 3. Patada, pie y recarga del super
         if (kickTimer > 0) kickTimer = Math.max(0, kickTimer - dt);
         updateFoot(dt, field);
         if (superTimer < SUPER_COOLDOWN) {
@@ -217,21 +208,6 @@ public abstract class Character {
         return ++score;
     }
 
-    public double getX(){
-        return x;
-    }
-
-    public double getY(){
-        return y;
-    }
-
-    public double getVx(){
-        return vx;
-    }
-
-    public double getVy(){
-        return vy;
-    }
 
     public int getFacing(){
         return facing;

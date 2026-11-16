@@ -1,6 +1,6 @@
 package domain;
 
-public abstract class Physics {
+public abstract class Physics{
     public static final double GRAVITY = 2500.0;
 
     protected double x, y;

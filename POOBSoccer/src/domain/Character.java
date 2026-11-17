@@ -1,6 +1,6 @@
 package domain;
 
-public abstract class Character {
+public abstract class Character extends Physics {
 
     //Valores base para el encogimiento
     private static final double BASE_RADIUS = 15;       // Cabeza CAMBIAR
@@ -9,12 +9,11 @@ public abstract class Character {
     private static final double BASE_LEG = 55;          // Pierna
 
     
-    private static final double GRAVITY = 2500.0;      
+    
     private static final double RADIUS = 35;          // la cabeza CAMBIAR 
     private static final double GAP = 30;             // la cabeza flota sobre el suelo para poner el pie 
     private static final double LEG = 55;             // largo de la pierna (La conexion entre la cabeza y el pie)
-    private static final double REST_ANGLE = 0.6;     // pie en reposo (Derecho no tiene ningun movimiento)
-    private static final double KICK_ANGLE = 2.0;   // pie en lo más alto de la patada (adelante y arriba)
+
     private double headScale = 1.0;
 
 
@@ -26,16 +25,14 @@ public abstract class Character {
     private double scale = 1.0;         // Escala del personaje(actual)
 
     //Movimiento de pies y cabeza
-    private double x, y;                // centro de la cabeza
-    private double vx, vy;      
+
+    private LegPhysics leg;
     private double startX;
     private int direction;              // -1 izquierda, 0 quieto, 1 derecha
     private int facing = 1;             // hacia dónde mira: 1 derecha, -1 izquierda
     private boolean onGround;
-    private double footX, footY;        // centro del pie
-    private double footVx, footVy;      // velocidad del pie (sirve para el golpe)
-    private double kickTimer;           // > 0 mientras la pierna está pateando
-    private final double kickDuration;  // más fuerza = patada más rápida
+
+    
     private int score;                  // MArcador que lleva el juagador
     private String country;             //Pais
     private int speed, jumpPower, strength;        //Valores del personaje
@@ -46,7 +43,7 @@ public abstract class Character {
         this.speed = speed;
         this.jumpPower = jumpPower;
         this.strength = strength;
-        this.kickDuration = 0.40 - 0.04 * strength;
+        this.leg = new LegPhysics(0.40 - 0.04 * strength);
         this.score = 0;
     }
 
@@ -73,7 +70,7 @@ public abstract class Character {
      * El golpe lo resuelve la colisión pie-balón. 
      */
     public void kickBall(){
-        if (kickTimer <= 0) kickTimer = kickDuration;
+        leg.kick();
     }
 
     public void activateSuper(Character rival) {
@@ -114,7 +111,7 @@ public abstract class Character {
      *  Física del personaje: avanza dt segundos.
      */
     public void update(double dt, Field field) {
-        // 1. Temporizador del encogimiento
+        // 1. Temporizadores de los efectos
         if (shrinkTimer > 0) {
             shrinkTimer = Math.max(0, shrinkTimer - dt);
             if (shrinkTimer == 0) {
@@ -124,54 +121,24 @@ public abstract class Character {
         if (invertTimer > 0) {
             invertTimer = Math.max(0, invertTimer - dt);
         }
-        
-    
-        // 2. Física adaptada al tamaño actual
+
+        // 2. Física: gravedad y movimiento heredados de Physics
         vx = direction * (180 + 60 * speed);
-        vy += GRAVITY * dt;
-        x += vx * dt;
-        y += vy * dt;
-    
+        integrate(dt);
+
         double r = getRadius();
         x = Math.max(r, Math.min(x, field.getWidth() - r));
-    
-        // Altura del suelo ajustada al tamaño
         double floorCenter = field.getFloorY() - r - (BASE_GAP * scale);
-        if (y >= floorCenter) {
-            y = floorCenter;
-            vy = 0;
-            onGround = true;
-        }
-    
-        if (kickTimer > 0) kickTimer = Math.max(0, kickTimer - dt);
-        updateFoot(dt, field);
+        if (y >= floorCenter) { y = floorCenter; vy = 0; onGround = true; }
+
+        // 3. Patada, pie y recarga del super
+        leg.update(dt, x, getHipY(), facing, scale, field.getFloorY());
         if (superTimer < SUPER_COOLDOWN) {
             superTimer = Math.min(SUPER_COOLDOWN, superTimer + dt);
         }
     }
 
-    /** 
-     * Coloca el pie según el avance de la patada y calcula su velocidad. 
-    */
-    private void updateFoot(double dt, Field field) {
-        double progress = kickTimer > 0 ? 1 - kickTimer / kickDuration : 0;
-        double angle = REST_ANGLE + (KICK_ANGLE - REST_ANGLE) * Math.sin(Math.PI * progress);
-        footTilt = angle - REST_ANGLE;
-    
-        double currentLeg = BASE_LEG * scale;
-        double newX = x + facing * currentLeg * Math.sin(angle);
-        double newY = Math.min(getHipY() + currentLeg * Math.cos(angle), field.getFloorY());
-    
-        if (dt > 0) {
-            footVx = (newX - footX) / dt;
-            footVy = (newY - footY) / dt;
-        } else {
-            footVx = 0;
-            footVy = 0;
-        }
-        footX = newX;
-        footY = newY;
-    }
+
 
     /** 
      * Vuelve a su posición inicial (después de un gol o al empezar). 
@@ -186,9 +153,9 @@ public abstract class Character {
         vy = 0;
         direction = 0;
         onGround = true;
-        kickTimer = 0;
         headScale = 1.0;
-        updateFoot(0, field);
+        leg.reset();
+        leg.update(0, x, getHipY(), facing, scale, field.getFloorY());
     }
 
     public void setStartX(double startX){
@@ -217,21 +184,6 @@ public abstract class Character {
         return ++score;
     }
 
-    public double getX(){
-        return x;
-    }
-
-    public double getY(){
-        return y;
-    }
-
-    public double getVx(){
-        return vx;
-    }
-
-    public double getVy(){
-        return vy;
-    }
 
     public int getFacing(){
         return facing;
@@ -242,31 +194,8 @@ public abstract class Character {
         return y + getRadius() - (5 * scale);
     }
 
-    public double getFootX(){
-        return footX;
-    }
-
-    public double getFootY(){
-        return footY;
-    }
-
-    public double getFootVx(){
-        return footVx;
-    }
-
-    public double getFootVy(){
-        return footVy;
-    }
-
-    public double getFootRadius() {
-        return BASE_FOOT_RADIUS * scale;
-    }
-    
 
 
-    public double getFootTilt(){
-        return footTilt;
-    }
     public double getScale() {
         return scale;
     }
@@ -287,5 +216,28 @@ public abstract class Character {
 
     public boolean isShrink(){
         return shrinkTimer > 0;
+    }
+    public double getFootX(){
+         return leg.getFootX(); 
+    }
+
+    public double getFootY(){
+         return leg.getFootY(); 
+    }
+
+    public double getFootVx(){
+         return leg.getFootVx(); 
+    }
+
+    public double getFootVy(){
+         return leg.getFootVy(); 
+    }
+
+    public double getFootTilt(){
+         return leg.getFootTilt(); 
+    }
+
+    public double getFootRadius(){
+         return leg.getFootRadius(scale); 
     }
 }

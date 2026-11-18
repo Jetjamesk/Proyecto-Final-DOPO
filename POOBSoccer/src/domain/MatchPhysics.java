@@ -16,6 +16,7 @@ public class MatchPhysics {
 
     public void step(double h) {
         for (Character c : characters) c.update(h, field);
+        collideCharacters();
         ball.update(h, field);
         for (Character c : characters) {
             ball.collideWithCircle(c.getX(), c.getY(), c.getRadius(), c.getVx(), c.getVy());
@@ -24,4 +25,26 @@ public class MatchPhysics {
         }
         ball.collideWithField(field);
     }
+
+    private void collideCharacters() {
+        /** Los personajes no se atraviesan: si se tocan, se separan y quedan frente a frente. */
+            Character a = characters.get(0);
+            Character b = characters.get(1);
+            double dx = b.x - a.x;
+            double dy = b.y - a.y;
+            double min = a.getRadius() + b.getRadius();   // distancia mínima permitida
+            double dist = Math.hypot(dx, dy);
+            if (dist >= min) return;                      // no se tocan, no hay nada que hacer
+
+            // Dirección de a hacia b
+            double nx = (a.x <= b.x) ? 1 : -1;
+            double ny = 0;
+            if (dist > 0) { nx = dx / dist; ny = dy / dist; }
+
+            // Cada uno retrocede la mitad de lo que se metió en el otro
+            double push = (min - dist) / 2;
+            a.x -= nx * push;   a.y -= ny * push;
+            b.x += nx * push;   b.y += ny * push;
+        }
+
 }

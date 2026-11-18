@@ -220,4 +220,7 @@ public abstract class Character extends Physics {
     public double getFootRadius(){
          return leg.getFootRadius(scale); 
     }
+
+
+
 }

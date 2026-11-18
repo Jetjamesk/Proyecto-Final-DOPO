@@ -14,6 +14,7 @@ import domain.Brasil;
 import domain.Character;
 import domain.Field;
 import domain.Match;
+import domain.TimedMatch;
 import java.awt.image.BufferedImage;
 import java.awt.geom.Path2D;
 import java.text.Normalizer;
@@ -29,7 +30,7 @@ public class GameGUI extends JPanel {
     private static final boolean SHOW_HITBOX = false;      
     private final Timer timer;                      
     private final Set<Integer> pressed = new HashSet<>();
-    private Match match;
+    private TimedMatch match;
     private Image image;
     private Image ballImage;
     private final Map<String, Image> faces = new HashMap<>();   // país -> imagen de la cara
@@ -118,7 +119,7 @@ public class GameGUI extends JPanel {
     }
 
     private void startMatch() {
-        match = new Match(player1, player2, new Field(1000, 600, 180), new Ball(0, 0));
+        match = new TimedMatch(player1, player2, new Field(1000, 600, 180), new Ball(0, 0));
         faces.clear();
         for (int i = 0; i < 2; i++) {
             String country = match.getPlayer(i).getCountry();
@@ -376,8 +377,8 @@ public class GameGUI extends JPanel {
         g2d.setColor(new Color(0, 0, 0, 150));
         g2d.fillRoundRect(w / 2 - 190, 8, 380, 66, 20, 20);
         g2d.setFont(new Font("SansSerif", Font.BOLD, 26));
-        String marcador = match.getPlayer(0).getCountry() + "  " + match.getPlayer(0).getScore()
-                + " - " + match.getPlayer(1).getScore() + "  " + match.getPlayer(1).getCountry();
+        String marcador = match.getPlayer(0).getCountry() + "  " + match.getScoreboard().getGoals(0)
+                + " - " + match.getScoreboard().getGoals(1) + "  " + match.getPlayer(1).getCountry();
         drawCentered(g2d, marcador, w / 2, 40, Color.WHITE);
         g2d.setFont(new Font("SansSerif", Font.BOLD, 20));
         String tiempo = match.isGoldenGoal() ? "GOL DE ORO" : String.valueOf((int) Math.ceil(match.getTimeLeft())) + " s";

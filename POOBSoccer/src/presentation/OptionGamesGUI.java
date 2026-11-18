@@ -8,14 +8,12 @@ public class OptionGamesGUI extends JPanel {
     private Image backgroundImage;
     private Image imgPvsP;
     private Image imgPvsM;
-    private Image imgMvsM;
     //Sizes for the buttons
     private int lastBw = 0;
     private int lastBh = 0;
     //Buttons
     private JButton button1;
     private JButton button2;
-    private JButton button3;
 
     public OptionGamesGUI(JPanel mainCardContainer, CardLayout cardLayout){
 

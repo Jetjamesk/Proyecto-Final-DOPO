@@ -13,7 +13,6 @@ import domain.Canada;
 import domain.Brasil;
 import domain.Character;
 import domain.Field;
-import domain.Match;
 import domain.TimedMatch;
 import java.awt.image.BufferedImage;
 import java.awt.geom.Path2D;
@@ -410,6 +409,8 @@ public class GameGUI extends JPanel {
         //superbars
         drawSuperBar(g2d, match.getPlayer(0), 40, 20, "SUPER [Q]");
         drawSuperBar(g2d, match.getPlayer(1), w - 180, 20, "SUPER [CTRL-DER]");
+        drawHealthBar(g2d, match.getPlayer(0), 40, 20, "Vida");
+        drawHealthBar(g2d, match.getPlayer(1), w - 180, 20, "vida");
         //Super affections being drawn
         for (int i=0; i<2; i++){
             Character p = match.getPlayer(i);
@@ -449,6 +450,30 @@ public class GameGUI extends JPanel {
         g2d.setFont(new Font("SansSerif", Font.BOLD, 12));
         String text = c.isSuperReady() ? label + " (¡LISTO!)" : label + " (" + (int)(progress * 100) + "%)";
         g2d.drawString(text, x, y + 12);
+    }
+
+    private void drawHealthBar(Graphics2D g2d, Character c, int x, int y, String label) {
+        int barW = 140;
+        int barH = 14;
+        double progress = Math.min(1.0, c.getHealth() / c.getMaxHealth());
+    
+        // Fondo gris
+        g2d.setColor(new Color(40, 40, 40, 200));
+        g2d.fillRoundRect(x, y + 32, barW, barH, 6, 6);
+    
+        // Barra de progreso (Oro si está lista, azul/cian cargando)
+        if (c.isStunned()) {
+            g2d.setColor(new Color(77, 0, 0));
+        } else {
+            g2d.setColor(new Color(47, 186, 88));
+        }
+        g2d.fillRoundRect(x, y + 32, (int) (barW * progress), barH, 6, 6);
+    
+        // Borde
+        g2d.setColor(Color.WHITE);
+        g2d.setStroke(new BasicStroke(1.5f));
+        g2d.drawRoundRect(x, y + 32, barW, barH, 6, 6);
+    
     }
 
     /**

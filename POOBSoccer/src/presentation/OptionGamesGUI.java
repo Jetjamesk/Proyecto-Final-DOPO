@@ -29,16 +29,13 @@ public class OptionGamesGUI extends JPanel {
 
         java.net.URL url1 = getClass().getResource("/images/ArcadeButton.png");
         java.net.URL url2 = getClass().getResource("/images/MultiplayerButton.png");
-        java.net.URL url3 = getClass().getResource("/images/RobotButton.png");
 
         ImageIcon iconPvsP = (url1 != null) ? new ImageIcon(url1) : new ImageIcon(); 
         ImageIcon iconPvsM = (url2 != null) ? new ImageIcon(url2) : new ImageIcon();
-        ImageIcon iconMvsM = (url3 != null) ? new ImageIcon(url3) : new ImageIcon();
 
         
         imgPvsP = iconPvsP.getImage();
         imgPvsM = iconPvsM.getImage();
-        imgMvsM = iconMvsM.getImage();
 
         button1 = new JButton(iconPvsP);
         button1.setBorderPainted(false);       
@@ -54,15 +51,6 @@ public class OptionGamesGUI extends JPanel {
         button2.setOpaque(false);              
         button2.addActionListener(null);
 
-        // Kept as text for now, but you can add a 3rd image url for this too
-        button3 = new JButton(iconMvsM);
-        button3.setBorderPainted(false);       
-        button3.setContentAreaFilled(false);   
-        button3.setFocusPainted(false);        
-        button3.setOpaque(false);              
-        button3.addActionListener(null);
-
-
         JButton button4 = new JButton("Volver");
         button4.setBounds(20, 20, 120, 35);
         button4.setFocusable(false);
@@ -75,11 +63,10 @@ public class OptionGamesGUI extends JPanel {
         button4.setBorderPainted(false);
 
 
-        button1.addActionListener(e -> cardLayout.show(mainCardContainer, "SelectCharacter"));;
+        button2.addActionListener(e -> cardLayout.show(mainCardContainer, "SelectCharacter"));;
 
         this.add(button1);
         this.add(button2);
-        this.add(button3);
         this.add(button4);
 
 
@@ -112,8 +99,7 @@ public class OptionGamesGUI extends JPanel {
         int gap = (int) (h * 0.05); 
 
         button1.setBounds(x, startY, bw, bh);
-        button2.setBounds(x, startY + bh + gap, bw, bh);
-        button3.setBounds(x, startY + (2 * bh) + (2 * gap), bw, bh);
+        button2.setBounds(x, startY + (2 * bh) + (2 * gap), bw, bh);
         
         if (bw > 0 && bh > 0 && (bw != lastBw || bh != lastBh)) {
             
@@ -125,11 +111,6 @@ public class OptionGamesGUI extends JPanel {
             if (imgPvsM != null) {
                 Image scaled2 = imgPvsM.getScaledInstance(bw, bh, Image.SCALE_SMOOTH);
                 button2.setIcon(new ImageIcon(scaled2));
-            }
-
-            if (imgMvsM != null){
-                Image scaled3 = imgMvsM.getScaledInstance(bw, bh, Image.SCALE_SMOOTH);
-                button3.setIcon(new ImageIcon(scaled3));
             }
             
             // Save the new dimensions so it doesn't recalculate on the next frame

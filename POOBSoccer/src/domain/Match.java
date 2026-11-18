@@ -13,7 +13,6 @@ public class Match {
     private ArrayList<Character> jugadores;
     private Field field;
     private Ball ball;
-    private MatchPhysics world;
 
 
     public Match(Character p1,Character p2, Field field, Ball ball){
@@ -22,7 +21,6 @@ public class Match {
         this.jugadores.add(p2);
         this.field = field;
         this.ball = ball;
-        this.world = new MatchPhysics(field, ball, jugadores);
         this.timeLeft = MATCH_TIME;
         this.isRunning = true;
         this.isPaused = false;
@@ -40,8 +38,7 @@ public class Match {
         int steps = (int) Math.ceil(dt / STEP);
         double h = dt / steps;
         for (int i = 0; i < steps && isRunning; i++) {
-            world.step(h);      // la física: mover y resolver choques
-            checkGoal();        // las reglas: ¿hubo gol?
+            step(h);
         }
         if (isRunning && !goldenGoal) {
             timeLeft -= dt;
@@ -49,6 +46,17 @@ public class Match {
         }
     }
 
+    private void step(double h){
+        for (Character p : jugadores) p.update(h, field);
+        ball.update(h, field);
+        for (Character p : jugadores) {
+            ball.collideWithCircle(p.getX(), p.getY(), p.getRadius(), p.getVx(), p.getVy());                  // cabeza
+            ball.collideWithCircle(p.getFootX(), p.getFootY(), p.getFootRadius(), p.getFootVx(), p.getFootVy()); // pie: aquí se patea
+        }
+        
+        ball.collideWithField(field);
+        checkGoal();
+    }
 
     /**
      * Verifica los goles hayan sido hechos

@@ -376,8 +376,8 @@ public class GameGUI extends JPanel {
         g2d.setColor(new Color(0, 0, 0, 150));
         g2d.fillRoundRect(w / 2 - 190, 8, 380, 66, 20, 20);
         g2d.setFont(new Font("SansSerif", Font.BOLD, 26));
-        String marcador = match.getPlayer(0).getCountry() + "  " + match.getPlayer(0).getScore()
-                + " - " + match.getPlayer(1).getScore() + "  " + match.getPlayer(1).getCountry();
+        String marcador = match.getPlayer(0).getCountry() + "  " + match.getScoreboard().getGoals(0)
+                + " - " + match.getScoreboard().getGoals(1) + "  " + match.getPlayer(1).getCountry();
         drawCentered(g2d, marcador, w / 2, 40, Color.WHITE);
         g2d.setFont(new Font("SansSerif", Font.BOLD, 20));
         String tiempo = match.isGoldenGoal() ? "GOL DE ORO" : String.valueOf((int) Math.ceil(match.getTimeLeft())) + " s";

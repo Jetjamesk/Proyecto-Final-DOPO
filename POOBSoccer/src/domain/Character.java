@@ -10,7 +10,7 @@ public abstract class Character extends Physics {
 
     //medidas para el super y efectos
     public static final double SUPER_COOLDOWN = 10.0; // Tiempo de cooldown del super
-    private double superTimer = 20.0;   //Tiempo de activacion del super
+    private double superTimer = 0.0;   //Tiempo de activacion del super
     private double invertTimer = 0.0;   //Tiempo de inversion de controles
     private double shrinkTimer = 0.0;   //Tiempo de encogimiento del personaje
     private double scale = 1.0;         // Escala del personaje(actual)
@@ -145,6 +145,10 @@ public abstract class Character extends Physics {
         headScale = 1.0;
         leg.reset();
         leg.update(0, x, getHipY(), facing, scale, field.getFloorY());
+    }
+
+    public void superReset(){
+        superTimer = 0.0;
     }
 
     public void setStartX(double startX){

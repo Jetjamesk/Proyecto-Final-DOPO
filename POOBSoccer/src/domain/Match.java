@@ -27,6 +27,9 @@ public abstract class Match {
         isRunning = true;
         isPaused = false;
         resetRound();
+        for(Character p: jugadores){
+            p.superReset();
+        }
     }
     /** Avanza el partido dt segundos. Lo llama la GUI en cada tick de su Timer. */
     public abstract void updateMatch(double dt);

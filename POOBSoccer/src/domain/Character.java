@@ -3,19 +3,10 @@ package domain;
 public abstract class Character extends Physics {
 
     //Valores base para el encogimiento
-    private static final double BASE_RADIUS = 15;       // Cabeza CAMBIAR
-    private static final double BASE_GAP = 30;          // Separación del suelo
-    private static final double BASE_FOOT_RADIUS = 18;  // Pie (hitbox)
-    private static final double BASE_LEG = 55;          // Pierna
-
-    
-    
+    private static final double BASE_GAP = 30;          // Separación del suelo 
     private static final double RADIUS = 35;          // la cabeza CAMBIAR 
     private static final double GAP = 30;             // la cabeza flota sobre el suelo para poner el pie 
-    private static final double LEG = 55;             // largo de la pierna (La conexion entre la cabeza y el pie)
-
     private double headScale = 1.0;
-
 
     //medidas para el super y efectos
     public static final double SUPER_COOLDOWN = 10.0; // Tiempo de cooldown del super
@@ -33,10 +24,8 @@ public abstract class Character extends Physics {
     private boolean onGround;
 
     
-    private int score;                  // MArcador que lleva el juagador
     private String country;             //Pais
-    private int speed, jumpPower, strength;        //Valores del personaje
-    private double footTilt;            
+    private int speed, jumpPower, strength;        //Valores del personaje            
 
     public Character(String country, int speed, int jumpPower, int strength){
         this.country = country;
@@ -44,7 +33,7 @@ public abstract class Character extends Physics {
         this.jumpPower = jumpPower;
         this.strength = strength;
         this.leg = new LegPhysics(0.40 - 0.04 * strength);
-        this.score = 0;
+    
     }
 
     /** Orden de movimiento: -1 izquierda, 0 quieto, 1 derecha. */
@@ -172,16 +161,9 @@ public abstract class Character extends Physics {
      */
     public abstract void usarPoder(Character rival);
 
-    public int getScore(){
-        return score;
-    }
 
     public String getCountry(){
         return country;
-    }
-
-    public int addScore(){
-        return ++score;
     }
 
 
@@ -193,8 +175,6 @@ public abstract class Character extends Physics {
     public double getHipY() {
         return y + getRadius() - (5 * scale);
     }
-
-
 
     public double getScale() {
         return scale;

@@ -2,7 +2,7 @@ package domain;
 
 import java.util.ArrayList;
 
-public class TimedMatch implements Match{
+public class TimedMatch extends Match{
 
     public static final double MATCH_TIME = 60;      // duración del partido (segundos)
     private double timeLeft;
@@ -10,21 +10,9 @@ public class TimedMatch implements Match{
 
 
     public TimedMatch(Character p1,Character p2, Field field, Ball ball){
-        this.jugadores = new ArrayList<>();
-        this.jugadores.add(p1);
-        this.jugadores.add(p2);
-        this.field = field;
-        this.ball = ball;
-        this.world = new MatchPhysics(field, ball, jugadores);
+        super(p1, p2, field, ball);
         this.timeLeft = MATCH_TIME;
-        this.isRunning = true;
-        this.isPaused = false;
         this.goldenGoal = false;
-        p1.setStartX(field.getWidth() * 0.25);
-        p2.setStartX(field.getWidth() * 0.75);
-        p1.setFacing(1);      
-        p2.setFacing(-1);     
-        resetRound();
     }
 
     public void updateMatch(double dt){
@@ -32,8 +20,8 @@ public class TimedMatch implements Match{
         int steps = (int) Math.ceil(dt / STEP);
         double h = dt / steps;
         for (int i = 0; i < steps && isRunning; i++) {
-            world.step(h);      // la física: mover y resolver choques
-            checkGoal();        // las reglas: ¿hubo gol?
+            world.step(h);      
+            checkGoal();        
         }
         if (isRunning && !goldenGoal) {
             timeLeft -= dt;

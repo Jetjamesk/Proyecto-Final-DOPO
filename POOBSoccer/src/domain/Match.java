@@ -1,33 +1,47 @@
 package domain;
 import java.util.ArrayList;
 
-public interface Match {
+public abstract class Match {
     public static final double STEP = 1.0 / 120.0;   // paso máximo de la física (segundos)
 
-    public boolean isRunning;
-    public boolean isPaused;
+    protected boolean isRunning;
+    protected boolean isPaused;
 
-    public final Scoreboard scoreboard = new Scoreboard();
-    public Character winner;
-    public ArrayList<Character> jugadores;
-    public Field field;
-    public Ball ball;
-    public MatchPhysics world;
+    protected final Scoreboard scoreboard = new Scoreboard();
+    protected Character winner;
+    protected final ArrayList<Character> jugadores = new ArrayList<>();
+    protected final Field field;
+    protected final Ball ball;
+    protected final MatchPhysics world;
 
+    public Match(Character p1,Character p2, Field field, Ball ball){
+        this.field = field;
+        this.ball = ball;
+        jugadores.add(p1);
+        jugadores.add(p2);
+        this.world = new MatchPhysics(field, ball, jugadores);
+        p1.setStartX(field.getWidth() * 0.25);
+        p2.setStartX(field.getWidth() * 0.75);
+        p1.setFacing(1);
+        p2.setFacing(-1);
+        isRunning = true;
+        isPaused = false;
+        resetRound();
+    }
     /** Avanza el partido dt segundos. Lo llama la GUI en cada tick de su Timer. */
-    public void updateMatch(double dt);
+    public abstract void updateMatch(double dt);
 
 
     /**
      * Verifica los goles hayan sido hechos
      */
-    public void checkGoal();
+    public abstract void checkGoal();
 
     /**
      * usar el poder sobre el rival
      * @param player que jugador usara el poder. 
      */
-    public default void usePower(int player){
+    public void usePower(int player){
         if (isRunning && !isPaused) {
             Character user = jugadores.get(player);
             Character rival = jugadores.get(1 - player);
@@ -36,13 +50,13 @@ public interface Match {
     }
 
     
-    public void endMatch();
+    public abstract void endMatch();
     
 
     /**
      * Reinicia a lso juagdores y el balon a la posicion inicial.
      */
-    public default void resetRound(){
+    public void resetRound(){
         for (Character p : jugadores){
             p.reset(field);
         } 
@@ -53,35 +67,35 @@ public interface Match {
      * Ordenes que los jugadores pueden tener
      * 
      */
-    public default void move(int player, int direction){
+    public  void move(int player, int direction){
         if (isRunning && !isPaused) jugadores.get(player).movement(direction);
     }
 
-    public default void jump(int player){
+    public void jump(int player){
         if (isRunning && !isPaused) jugadores.get(player).jump();
     }
 
-    public default void kick(int player){
+    public void kick(int player){
         if (isRunning && !isPaused) {
             jugadores.get(player).kickBall();
         }
     }
 
-    public default void pause(){
+    public void pause(){
         if (isRunning) {
             isPaused = true;
         }    
     }
 
-    public default void resume(){
+    public void resume(){
         isPaused = false;
     }
 
-    public default boolean isRunning()   { return isRunning; }
-    public default boolean isPaused()    { return isPaused; }
-    public default Character getWinner() { return winner; }
-    public default Character getPlayer(int i){ return jugadores.get(i); }
-    public default Ball getBall()        { return ball; }
-    public default Field getField()      { return field; }
-    public default Scoreboard getScoreboard() { return scoreboard; }
+    public boolean isRunning()   { return isRunning; }
+    public boolean isPaused()    { return isPaused; }
+    public Character getWinner() { return winner; }
+    public Character getPlayer(int i){ return jugadores.get(i); }
+    public Ball getBall()        { return ball; }
+    public Field getField()      { return field; }
+    public Scoreboard getScoreboard() { return scoreboard; }
 }

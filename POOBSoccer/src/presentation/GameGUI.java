@@ -13,6 +13,7 @@ import domain.Canada;
 import domain.Brasil;
 import domain.Character;
 import domain.Field;
+import domain.PlayerStats;
 import domain.TimedMatch;
 import java.awt.image.BufferedImage;
 import java.awt.geom.Path2D;
@@ -483,21 +484,39 @@ public class GameGUI extends JPanel {
      */
     private void drawMessages(Graphics2D g2d, Field field) {
         String msg = null;
+        String pointsMsg = null;   // mensaje pequeño debajo: puntos ganados
         if (!match.isRunning()) {
             Character winner = match.getWinner();
-            msg = winner == null ? "EMPATE" : "¡Ganó " + winner.getCountry() + "!";
+            if (winner != null) {
+                int winnerNumber = (winner == match.getPlayer(0)) ? 1 : 2;
+                int loserNumber = 3 - winnerNumber;
+                msg = "¡Ganó Jugador " + winnerNumber + "!";
+                pointsMsg = "Jugador " + winnerNumber + " ganó " + PlayerStats.WIN_POINTS + " puntos"
+                          + "   ·   Jugador " + loserNumber + " ganó " + PlayerStats.LOSS_POINTS + " puntos";
+            } else {
+                msg = "EMPATE";
+                pointsMsg = "Cada jugador ganó " + PlayerStats.LOSS_POINTS + " puntos";
+            }
         } else if (match.isPaused()) {
             msg = "PAUSA";
         }
-        if (msg == null){
-             return;
-            }
-        g2d.setColor(new Color(0, 0, 0, 170));
-        g2d.fillRect(0, field.getHeight() / 2 - 60, field.getWidth(), 100);
-        g2d.setFont(new Font("SansSerif", Font.BOLD, 44));
-        drawCentered(g2d, msg, field.getWidth() / 2, field.getHeight() / 2 + 8, Color.WHITE);
-    }
+        if (msg == null) {
+            return;
+        }
+        int centerX = field.getWidth() / 2;
+        int centerY = field.getHeight() / 2;
+        int bandHeight = (pointsMsg != null) ? 135 : 100;   // franja más alta si hay mensaje de puntos
 
+        g2d.setColor(new Color(0, 0, 0, 170));
+        g2d.fillRect(0, centerY - 60, field.getWidth(), bandHeight);
+        g2d.setFont(new Font("SansSerif", Font.BOLD, 44));
+        drawCentered(g2d, msg, centerX, centerY + 8, Color.WHITE);
+
+        if (pointsMsg != null) {
+            g2d.setFont(new Font("SansSerif", Font.BOLD, 20));
+            drawCentered(g2d, pointsMsg, centerX, centerY + 50, new Color(255, 215, 0));
+        }
+    }
     private void drawCentered(Graphics2D g2d, String text, int cx, int baselineY, Color color) {
         int w = g2d.getFontMetrics().stringWidth(text);
         g2d.setColor(color);

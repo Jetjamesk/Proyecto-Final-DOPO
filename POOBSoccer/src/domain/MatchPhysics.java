@@ -20,10 +20,12 @@ public class MatchPhysics {
         ball.update(h, field);
         for (Character c : characters) {
             ball.collideWithCircle(c.getX(), c.getY(), c.getRadius(), c.getVx(), c.getVy());
-            ball.collideWithCircle(c.getFootX(), c.getFootY(), c.getFootRadius(),
+            boolean footTouched = ball.collideWithCircle(c.getFootX(), c.getFootY(), c.getFootRadius(),
                                    c.getFootVx(), c.getFootVy());
+                                   if (footTouched && c.canLandKick()) c.kickTouchedBall();
         }
         ball.collideWithField(field);
+        resolveKicks();
     }
 
     private void collideCharacters() {
@@ -45,6 +47,19 @@ public class MatchPhysics {
             double push = (min - dist) / 2;
             a.x -= nx * push;   a.y -= ny * push;
             b.x += nx * push;   b.y += ny * push;
+        }
+
+        private void resolveKicks() {
+            for (int i = 0; i < characters.size(); i++) {
+                Character attacker = characters.get(i);
+                Character rival = characters.get(1 - i);
+                if (!attacker.canLandKick()) continue;
+                double dist = Math.hypot(attacker.getFootX() - rival.getX(),
+                                         attacker.getFootY() - rival.getY());
+                if (dist < attacker.getFootRadius() + rival.getRadius()) {
+                    attacker.landKick(rival);
+                }
+            }
         }
 
 }

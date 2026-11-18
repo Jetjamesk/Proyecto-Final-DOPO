@@ -26,6 +26,8 @@ public abstract class Match {
         p2.setFacing(-1);
         isRunning = true;
         isPaused = false;
+        p1.restoreHealth();
+        p2.restoreHealth();
         resetRound();
     }
     /** Avanza el partido dt segundos. Lo llama la GUI en cada tick de su Timer. */
@@ -50,8 +52,20 @@ public abstract class Match {
     }
 
     
-    public abstract void endMatch();
+    public void endMatch(){
+        if (!isRunning) return;        
+        isRunning = false;
+        int leader = scoreboard.leader();
+        winner = leader < 0 ? null : jugadores.get(leader);
+        awardPoints();
+    }
     
+    /** Informa el resultado a cada jugador; PlayerStats decide cuántos puntos da. */
+    private void awardPoints(){
+        for (Character p : jugadores) {
+            p.getPlayerStats().rewardMatch(p == winner);
+        }
+    }
 
     /**
      * Reinicia a lso juagdores y el balon a la posicion inicial.

@@ -119,7 +119,7 @@ public class GameGUI extends JPanel {
     }
 
     private void startMatch() {
-        match = new TimedMatch(player1, player2, new Field(1000, 600, 180), new Ball(0, 0));
+        match = new TimedMatch(player1, player2, new Field(1000, 600, 180), new Ball(0, 0),60);
         faces.clear();
         for (int i = 0; i < 2; i++) {
             String country = match.getPlayer(i).getCountry();

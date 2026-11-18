@@ -6,31 +6,33 @@ public class LegPhysics {
     private static final double BASE_LEG = 55;      // largo de la pierna
     private static final double BASE_FOOT_RADIUS = 18;
 
-    private final double kickDuration;  // más fuerza = patada más rápida
+    private final double KICK_DURATION = 0.25;  // más fuerza = patada más rápida
     private double kickTimer;           // > 0 mientras está pateando
+    private boolean hit;
     private double footX, footY;
     private double footVx, footVy;
     private double footTilt;
 
-    public LegPhysics(double kickDuration) {
-        this.kickDuration = kickDuration;
-    }
 
     /** Empieza la patada si no está pateando ya. */
     public void kick() {
-        if (kickTimer <= 0) kickTimer = kickDuration;
+        if (kickTimer <= 0) {
+            kickTimer = KICK_DURATION;
+            hit= false;
+        }
     }
 
     /** Detiene la patada (al reiniciar la ronda). */
     public void reset() {
         kickTimer = 0;
+        hit = false;
     }
 
     /** Avanza la patada y coloca el pie según dónde está el cuerpo. */
     public void update(double dt, double hipX, double hipY, int facing, double scale, double floorY) {
         if (kickTimer > 0) kickTimer = Math.max(0, kickTimer - dt);
 
-        double progress = kickTimer > 0 ? 1 - kickTimer / kickDuration : 0;
+        double progress = kickTimer > 0 ? 1 - kickTimer / KICK_DURATION : 0;
         double angle = REST_ANGLE + (KICK_ANGLE - REST_ANGLE) * Math.sin(Math.PI * progress);
         footTilt = angle - REST_ANGLE;
 
@@ -68,4 +70,8 @@ public class LegPhysics {
     public double getFootRadius(double scale){
         return BASE_FOOT_RADIUS * scale; 
     }
+
+    public boolean isKicking() { return kickTimer > 0; }
+    public boolean hasHit()    { return hit; }
+    public void markHit()      { hit = true; }
 }

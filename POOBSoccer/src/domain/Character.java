@@ -7,7 +7,8 @@ public abstract class Character extends Physics {
     private static final double RADIUS = 35;          // la cabeza CAMBIAR 
     private static final double GAP = 30;             // la cabeza flota sobre el suelo para poner el pie 
     private double headScale = 1.0;
-
+    public static final double STUN_DURATION= 3.0;
+    private double stunTimer = 0.0;
     //medidas para el super y efectos
     public static final double SUPER_COOLDOWN = 10.0; // Tiempo de cooldown del super
     private double superTimer = 0.0;   //Tiempo de activacion del super
@@ -25,14 +26,14 @@ public abstract class Character extends Physics {
 
     
     private String country;             //Pais
-    private int speed, jumpPower, strength;        //Valores del personaje            
+    private final CharacterStats stats = new CharacterStats();
+    private double health;
+    
 
-    public Character(String country, int speed, int jumpPower, int strength){
+    public Character(String country){
         this.country = country;
-        this.speed = speed;
-        this.jumpPower = jumpPower;
-        this.strength = strength;
-        this.leg = new LegPhysics(0.40 - 0.04 * strength);
+        this.leg = new LegPhysics();
+        this.health = stats.maxHealth();
     
     }
 
@@ -49,8 +50,8 @@ public abstract class Character extends Physics {
      * Salto del personaje
      */
     public void jump(){
-        if (onGround) {
-            vy = -(450 + 70 * jumpPower);
+        if (onGround&& !isStunned()) {
+            vy = -stats.jumpVelocity();
             onGround = false;
         }
     }
@@ -59,8 +60,37 @@ public abstract class Character extends Physics {
      * El golpe lo resuelve la colisión pie-balón. 
      */
     public void kickBall(){
-        leg.kick();
+        if (!isStunned()){
+            leg.kick();
+        }
     }
+
+    public void kickTouchedBall(){
+        leg.markHit();
+    }
+    
+
+    public void landKick(Character rival){
+        rival.takeDamage(stats.kickDamage());
+        leg.markHit();
+    }
+
+        /**
+     * Recibe daño; la vida nunca baja de 0. Al llegar a 0 queda aturdido.
+     * Mientras está aturdido no recibe más daño.
+     */
+    public void takeDamage(double amount){
+        if (amount <= 0 || isStunned()) return;
+        health = Math.max(0, health - amount);
+        if (health == 0) stunTimer = STUN_DURATION;
+    }
+
+    
+    public void restoreHealth(){
+        health = stats.maxHealth();
+        stunTimer = 0.0;
+    }
+
 
     public void activateSuper(Character rival) {
         if (isSuperReady()) {
@@ -110,9 +140,14 @@ public abstract class Character extends Physics {
         if (invertTimer > 0) {
             invertTimer = Math.max(0, invertTimer - dt);
         }
-
+        if (stunTimer > 0){
+            stunTimer = Math.max(0,stunTimer - dt);
+            if(stunTimer == 0) {
+                restoreHealth();
+            }
+        }
         // 2. Física: gravedad y movimiento heredados de Physics
-        vx = direction * (180 + 60 * speed);
+        vx = isStunned() ? 0 : direction * stats.moveSpeed();;
         integrate(dt);
 
         double r = getRadius();
@@ -170,6 +205,10 @@ public abstract class Character extends Physics {
         return country;
     }
 
+    public boolean canLandKick(){
+        return leg.isKicking() && !leg.hasHit();
+    }
+
 
     public int getFacing(){
         return facing;
@@ -224,7 +263,26 @@ public abstract class Character extends Physics {
     public double getFootRadius(){
          return leg.getFootRadius(scale); 
     }
+    public boolean isStunned(){
+        return stunTimer > 0;
+    }
 
+    /** Atributos efectivos del personaje (para mostrarlos en la GUI, por ejemplo). */
+    public CharacterStats getStats(){
+        return stats;
+    }
+
+    public void setPlayerStats(PlayerStats playerStats){
+        stats.setProgress(playerStats);
+    }
+
+    public PlayerStats getPlayerStats(){
+        return stats.getProgress();
+    }
+
+    public double getHealth()    { return health; }
+    public double getMaxHealth() { return stats.maxHealth(); }
+    public double getStunTimer() { return stunTimer; }
 
 
 }

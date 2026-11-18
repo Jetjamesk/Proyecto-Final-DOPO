@@ -29,9 +29,4 @@ public class GoalMatch extends Match {
         else resetRound();
     }
 
-    public void endMatch(){
-        isRunning = false;
-        int leader = scoreboard.leader();
-        winner = jugadores.get(leader);
-    }
 }

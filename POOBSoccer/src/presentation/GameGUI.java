@@ -33,6 +33,8 @@ public class GameGUI extends JPanel {
     private TimedMatch match;
     private Image image;
     private Image ballImage;
+    private JButton btnResume;
+    private JButton btnMenu;
     private final Map<String, Image> faces = new HashMap<>();   // país -> imagen de la cara
     private long lastNanos; //Con él se calcula cuánto tiempo pasó entre un tick y el siguiente, para que el juego se mueva a la misma velocidad
     private Character player1 = new Canada();
@@ -66,13 +68,30 @@ public class GameGUI extends JPanel {
 
         startMatch();
 
-        // Botón para regresar al menú
-        RoundButton btnVolver = new RoundButton("←");
-        btnVolver.setBounds(10, 40, 150, 30);
-        btnVolver.addActionListener(e -> {
-            cardLayout.show(mainCardContainer, "Menu");
+        // Botón de pausa del juego.
+        RoundButton btnPausa = new RoundButton("II");
+        btnPausa.setBounds(10, 40, 40, 40);
+        btnPausa.addActionListener(e -> {
+            if (match.isRunning()){
+                togglePause();
+            }else {
+                cardLayout.show(mainCardContainer, "Menu");
+            }
         });
-        this.add(btnVolver);
+        this.add(btnPausa);
+        // Botones del menú de pausa (empiezan ocultos)
+        btnResume = createMenuButton("Seguir jugando");
+        btnResume.addActionListener(e -> {
+            togglePause();
+            requestFocusInWindow();
+        });
+
+        btnMenu = createMenuButton("Salir al menú principal");
+        btnMenu.addActionListener(e -> cardLayout.show(mainCardContainer, "Menu"));
+
+        this.add(btnResume);
+        this.add(btnMenu);
+        setPauseMenuVisible(false);
 
         // Cada ciclo de ~16 ms: leer teclas, avanzar el dominio y redibujar
         timer = new Timer(16, e -> tick());
@@ -119,6 +138,9 @@ public class GameGUI extends JPanel {
     }
 
     private void startMatch() {
+        if (btnResume != null){
+            setPauseMenuVisible(false);
+        }
         match = new TimedMatch(player1, player2, new Field(1000, 600, 180), new Ball(0, 0),60);
         faces.clear();
         for (int i = 0; i < 2; i++) {
@@ -161,6 +183,7 @@ public class GameGUI extends JPanel {
             match.pause();
         }
         lastNanos = System.nanoTime();
+        setPauseMenuVisible(match.isPaused());
     }
 
     /**
@@ -439,7 +462,7 @@ public class GameGUI extends JPanel {
             Character winner = match.getWinner();
             msg = winner == null ? "EMPATE" : "¡Ganó " + winner.getCountry() + "!";
         } else if (match.isPaused()) {
-            msg = "PAUSA  (P para continuar)";
+            msg = "PAUSA";
         }
         if (msg == null){
              return;
@@ -483,5 +506,35 @@ public class GameGUI extends JPanel {
         return bi.getSubimage(minX, minY, maxX - minX + 1, maxY - minY + 1);
     }
 
-    
+    private JButton createMenuButton(String text) {
+        JButton b = new JButton(text);
+        b.setFont(new Font("Arial", Font.BOLD, 18));
+        b.setBackground(new Color(30, 30, 30));
+        b.setForeground(Color.WHITE);
+        b.setOpaque(true);
+        b.setContentAreaFilled(true);
+        b.setFocusPainted(false);
+        b.setFocusable(false);
+        b.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+        b.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return b;
+    }
+
+    private void setPauseMenuVisible(boolean visible) {
+        btnResume.setVisible(visible);
+        btnMenu.setVisible(visible);
+    }
+
+    @Override
+    public void doLayout() {
+        super.doLayout();
+        if (btnResume == null || btnMenu == null) return;
+        int bw = 300, bh = 50, gap = 15;
+        int x = (getWidth() - bw) / 2;
+        int y = (int) (getHeight() * 0.62);
+        btnResume.setBounds(x, y, bw, bh);
+        btnMenu.setBounds(x, y + bh + gap, bw, bh);
+    }
+
+
 }

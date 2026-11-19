@@ -61,7 +61,7 @@ public class OptionGamesGUI extends JPanel {
         button4.setBorderPainted(false);
 
 
-        button2.addActionListener(e -> cardLayout.show(mainCardContainer, "SelectCharacter"));;
+        button2.addActionListener(e -> cardLayout.show(mainCardContainer, "MatchOptions"));;
 
         this.add(button1);
         this.add(button2);

@@ -107,7 +107,8 @@ public abstract class Match {
     public void resume(){
         isPaused = false;
     }
-
+    public abstract double getTimeLeft();
+    public abstract boolean isGoldenGoal();
     public boolean isRunning()   { return isRunning; }
     public boolean isPaused()    { return isPaused; }
     public Character getWinner() { return winner; }

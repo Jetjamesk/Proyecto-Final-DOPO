@@ -28,5 +28,10 @@ public class GoalMatch extends Match {
         if (scoreboard.getGoals(scorer) >= goalsToWin) endMatch();
         else resetRound();
     }
-
+    public double getTimeLeft(){
+        return 0.0;
+    };
+    public boolean isGoldenGoal(){
+        return false;
+    };
 }

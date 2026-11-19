@@ -14,7 +14,9 @@ import domain.Brasil;
 import domain.Character;
 import domain.Field;
 import domain.PlayerStats;
+import domain.Match;
 import domain.TimedMatch;
+import domain.GoalMatch;
 import java.awt.image.BufferedImage;
 import java.awt.geom.Path2D;
 import java.text.Normalizer;
@@ -27,10 +29,14 @@ public class GameGUI extends JPanel {
     private static final double HEAD_SCALE = 1.15;         // tamaño de la cara respecto a la hitbox 
     private static final boolean FACE_LOOKS_RIGHT = false; //Para la cara del muñeco de la izquierda 
     private static final double BOOT_SCALE = 1.0;          // tamaño de la bota 
-    private static final boolean SHOW_HITBOX = false;      
+    private static final boolean SHOW_HITBOX = false;
+    public enum MatchType {TIME,GOAL};
+    
+    private MatchType matchType = MatchType.TIME;
+    private int matchValue = 1;
     private final Timer timer;                      
     private final Set<Integer> pressed = new HashSet<>();
-    private TimedMatch match;
+    private Match match;
     private Image image;
     private Image ballImage;
     private JButton btnResume;
@@ -39,6 +45,19 @@ public class GameGUI extends JPanel {
     private long lastNanos; //Con él se calcula cuánto tiempo pasó entre un tick y el siguiente, para que el juego se mueva a la misma velocidad
     private Character player1 = new Canada();
     private Character player2 = new Brasil();
+
+
+
+
+        /**
+     * Guarda el tipo de partido y su valor elegidos en el menú.
+     * @param type  TIME o GOAL
+     * @param value minutos si es TIME, goles para ganar si es GOAL
+     */
+        public void setMatchConfig(MatchType type, int value) {
+            this.matchType = type;
+            this.matchValue = Math.max(1, value);
+        }
 
     public void setPlayers(Character p1, Character p2) {
         this.player1 = p1;
@@ -141,7 +160,13 @@ public class GameGUI extends JPanel {
         if (btnResume != null){
             setPauseMenuVisible(false);
         }
-        match = new TimedMatch(player1, player2, new Field(1000, 600, 180), new Ball(0, 0),60);
+        Field field =new Field(1000, 600, 180);
+        Ball ball =new Ball(0, 0);
+        if (matchType == MatchType.GOAL) {
+            match = new GoalMatch(player1, player2, field, ball, matchValue);
+        } else {
+            match = new TimedMatch(player1, player2, field, ball, matchValue * 60);   // minutos -> segundos
+        }
         faces.clear();
         for (int i = 0; i < 2; i++) {
             String country = match.getPlayer(i).getCountry();

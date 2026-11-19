@@ -22,7 +22,7 @@ public class Ball extends Physics{
     }
 
     /** Rebote contra un personaje (círculo que se mueve con velocidad cvx, cvy). */
-    public boolean collideWithCircle(double cx, double cy, double cr, double cvx, double cvy) {
+        public boolean collideWithCircle(double cx, double cy, double cr, double cvx, double cvy) {
         return Collisions.bounceOffCircle(this, RESTITUTION, cx, cy, cr, cvx, cvy);
     }
 

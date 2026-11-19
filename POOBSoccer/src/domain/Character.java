@@ -28,12 +28,14 @@ public abstract class Character extends Physics {
     private String country;             //Pais
     private final CharacterStats stats = new CharacterStats();
     private double health;
+    private final Power power;
     
 
-    public Character(String country){
+    public Character(String country, Power power){
         this.country = country;
         this.leg = new LegPhysics();
         this.health = stats.maxHealth();
+        this.power = power;
     
     }
 
@@ -95,7 +97,7 @@ public abstract class Character extends Physics {
     public void activateSuper(Character rival) {
         if (isSuperReady()) {
             superTimer = 0.0;
-            usarPoder(rival);
+            power.use(rival);
         }
     }
     /**
@@ -195,10 +197,6 @@ public abstract class Character extends Physics {
         this.facing = Integer.signum(facing) == 0 ? 1 : Integer.signum(facing);
     }
 
-    /**
-     * Es una clase abstracta o una interfaz ??
-     */
-    public abstract void usarPoder(Character rival);
 
 
     public String getCountry(){

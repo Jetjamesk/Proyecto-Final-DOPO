@@ -1,14 +1,14 @@
 package domain;
 
 public abstract class Character extends Physics {
-
     //Valores base para el encogimiento
-    private static final double BASE_GAP = 30;          // Separación del suelo 
-    private static final double RADIUS = 35;          // la cabeza CAMBIAR 
-    private static final double GAP = 30;             // la cabeza flota sobre el suelo para poner el pie 
+    private static final double BASE_GAP = 30;          // Separación del suelo
+    private static final double RADIUS = 35;          // la cabeza CAMBIAR
+    private static final double GAP = 30;             // la cabeza flota sobre el suelo para poner el pie
     private double headScale = 1.0;
     public static final double STUN_DURATION= 3.0;
     private double stunTimer = 0.0;
+
     //medidas para el super y efectos
     public static final double SUPER_COOLDOWN = 10.0; // Tiempo de cooldown del super
     private double superTimer = 0.0;   //Tiempo de activacion del super
@@ -238,6 +238,7 @@ public abstract class Character extends Physics {
     public boolean isShrink(){
         return shrinkTimer > 0;
     }
+
     public double getFootX(){
          return leg.getFootX(); 
     }
@@ -261,6 +262,7 @@ public abstract class Character extends Physics {
     public double getFootRadius(){
          return leg.getFootRadius(scale); 
     }
+
     public boolean isStunned(){
         return stunTimer > 0;
     }

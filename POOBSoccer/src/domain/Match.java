@@ -13,6 +13,7 @@ public abstract class Match {
     protected final Field field;
     protected final Ball ball;
     protected final MatchPhysics world;
+    protected final Bot[] bots = new Bot[2];
 
     public Match(Character p1,Character p2, Field field, Ball ball){
         this.field = field;
@@ -96,6 +97,14 @@ public abstract class Match {
         if (isRunning && !isPaused) {
             jugadores.get(player).kickBall();
         }
+    }
+
+    public void setBot(int player, Bot bot){
+        bots[player] = bot;
+    }
+
+    public boolean isBot(int player){
+        return bots[player] != null;
     }
 
     public void pause(){

@@ -16,6 +16,9 @@ public class TimedMatch extends Match{
     }
 
     public void updateMatch(double dt){
+        for (int i = 0; i < 2; i++) {
+            if (bots[i] != null) bots[i].Decide(this, i, dt);   // la máquina decide antes de la física
+        }
         if (!isRunning || isPaused || dt <= 0) return;
         int steps = (int) Math.ceil(dt / STEP);
         double h = dt / steps;

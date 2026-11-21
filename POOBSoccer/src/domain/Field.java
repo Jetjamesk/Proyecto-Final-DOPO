@@ -1,7 +1,7 @@
 package domain;
 
 
-public class Field {
+public class Field implements java.io.Serializable {
     private static final int GROUND_HEIGHT = 50;
     private static final int GOAL_DEPTH = 80;
     private int width;

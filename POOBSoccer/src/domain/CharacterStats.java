@@ -1,7 +1,7 @@
 package domain;
 
 
-public class CharacterStats {
+public class CharacterStats implements java.io.Serializable{
 
     public static final double BASE_MOVE_SPEED = 400;     // px/s con Speed = 1
     public static final double BASE_JUMP_VELOCITY = 700;  // px/s con Jump = 1

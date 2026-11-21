@@ -15,6 +15,8 @@ public class OptionGamesGUI extends JPanel {
     //Buttons
     private JButton button1;
     private JButton button2;
+    
+    public static boolean isBot = false;
 
     public OptionGamesGUI(JPanel mainCardContainer, CardLayout cardLayout){
 
@@ -62,7 +64,14 @@ public class OptionGamesGUI extends JPanel {
         button4.setBorderPainted(false);
 
         
-        button2.addActionListener(e -> cardLayout.show(mainCardContainer, "MatchOptions"));;
+        button2.addActionListener(e ->{ 
+            cardLayout.show(mainCardContainer, "MatchOptions");
+            isBot = false;
+        });;
+        button1.addActionListener(e -> {
+            cardLayout.show(mainCardContainer, "MatchOptions");
+            isBot = true;
+        });
 
         this.add(button1);
         this.add(button2);
@@ -116,5 +125,9 @@ public class OptionGamesGUI extends JPanel {
             lastBw = bw;
             lastBh = bh;
         }
+    }
+
+    public static boolean getIsBot(){
+        return isBot;
     }
 }

@@ -2,7 +2,7 @@ package domain;
 
 import java.util.List;
 
-public class MatchPhysics {
+public class MatchPhysics implements java.io.Serializable {
     private final Field field;
     private final Ball ball;
     private final List<Character> characters;

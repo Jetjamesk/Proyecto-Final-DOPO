@@ -1,7 +1,10 @@
 package domain;
+import java.io.*;
 import java.util.ArrayList;
 
-public abstract class Match {
+public abstract class Match implements Serializable {
+    public static final String EXTENSION = ".poob";
+    private static final String HEADER = "POOBSoccer-";
     public static final double STEP = 1.0 / 120.0;   // paso máximo de la física (segundos)
 
     protected boolean isRunning;
@@ -77,6 +80,8 @@ public abstract class Match {
     public void resetRound(){
         for (Character p : jugadores){
             p.reset(field);
+            p.restoreHealth();
+            
         } 
         ball.reset(field.getWidth() / 2.0, field.getHeight() * 0.25);
     }
@@ -116,8 +121,71 @@ public abstract class Match {
     public void resume(){
         isPaused = false;
     }
-    public abstract double getTimeLeft();
-    public abstract boolean isGoldenGoal();
+
+    /**
+     * Se encarga de guardar el archivo .poob
+     * @param file
+     * @throws POOBSoccerException
+     */
+    public void save(File file) throws POOBSoccerException {
+        if (file == null) {
+            throw new POOBSoccerException(POOBSoccerException.FILE_NULL);
+        }
+        if (!file.getName().toLowerCase().endsWith(EXTENSION)) {
+            throw new POOBSoccerException(POOBSoccerException.WRONG_EXTENSION);
+        }
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
+            out.writeUTF(HEADER);
+            out.writeObject(this);
+        } catch (IOException e) {
+            throw new POOBSoccerException("No se pudo guardar el archivo: " + e.getMessage());
+        }
+    }
+
+    /**
+     * El encargado de abir el archivo .poob
+     * @param file
+     * @return
+     * @throws POOBSoccerException
+     */
+    public static Match open(File file) throws POOBSoccerException {
+        if (file == null) {
+            throw new POOBSoccerException(POOBSoccerException.FILE_NULL);
+        }
+        if (!file.getName().toLowerCase().endsWith(EXTENSION)) {
+            throw new POOBSoccerException(POOBSoccerException.WRONG_EXTENSION);
+        }
+        if (!file.isFile()) {
+            throw new POOBSoccerException(POOBSoccerException.FILE_NOT_FOUND);
+        }
+        if (file.length() == 0) {
+            throw new POOBSoccerException(POOBSoccerException.FILE_EMPTY);
+        }
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
+            if (!HEADER.equals(in.readUTF())) {
+                throw new POOBSoccerException(POOBSoccerException.NOT_POOBSccoer_FILE);
+            }
+            Object obj = in.readObject();
+            if (!(obj instanceof Match)) {
+                throw new POOBSoccerException(POOBSoccerException.NOT_POOBSccoer_FILE);
+            }
+            return (Match) obj;
+        } catch (StreamCorruptedException e) {
+            throw new POOBSoccerException(POOBSoccerException.NOT_POOBSccoer_FILE);
+        } catch (FileNotFoundException e) {
+            throw new POOBSoccerException(POOBSoccerException.FILE_NOT_FOUND);
+        } catch (IOException | ClassNotFoundException e) {
+            throw new POOBSoccerException(POOBSoccerException.CORRUPT_DATA);
+        }
+    }
+
+    protected void updateBots(double dt) {
+        if (!isRunning || isPaused) return;
+        for (int i = 0; i < bots.length; i++) {
+            if (bots[i] != null) bots[i].Decide(this, i, dt);
+        }
+    }
+
     public boolean isRunning()   { return isRunning; }
     public boolean isPaused()    { return isPaused; }
     public Character getWinner() { return winner; }
@@ -125,4 +193,6 @@ public abstract class Match {
     public Ball getBall()        { return ball; }
     public Field getField()      { return field; }
     public Scoreboard getScoreboard() { return scoreboard; }
+    public abstract boolean isGoldenGoal();
+    public abstract double getTimeLeft();
 }

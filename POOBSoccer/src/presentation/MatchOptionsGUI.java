@@ -1,5 +1,6 @@
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -54,13 +55,12 @@ public class MatchOptionsGUI extends JPanel {
         }
         this.setLayout(null);
 
-        int w= getWidth();
-        int h= getHeight();
         java.net.URL url1 = getClass().getResource("/images/TimedMatch.png");
         java.net.URL url2 = getClass().getResource("/images/GoalMatch.png");
 
         imgMatchTime = (url1 != null) ? new ImageIcon(url1).getImage() : null;
         imgMatchGoal = (url2 != null) ? new ImageIcon(url2).getImage() : null;
+
 
         // Los botones se agrandan solos; aquí solo se decide qué hacer con su texto
         button1 = new HoverImageButton(imgMatchTime, TIME_TEXT, HOVER_SCALE);
@@ -75,7 +75,7 @@ public class MatchOptionsGUI extends JPanel {
         timeForMatch.setSnapToTicks(true);     
         timeForMatch.setPaintTicks(true);      
         timeForMatch.setPaintLabels(true);
-        timeForMatch.setSize(w/3, h/3);
+
 
         JSlider goalsForMatch = new JSlider(1, 15, 3);
         goalsForMatch.setMajorTickSpacing(1);   
@@ -93,7 +93,11 @@ public class MatchOptionsGUI extends JPanel {
 
             int minutes = timeForMatch.getValue();
             gameGUI.setMatchConfig(GameGUI.MatchType.TIME, minutes);
-            cardLayout.show(mainCardContainer, "SelectCharacter");
+            if (!OptionGamesGUI.getIsBot()){
+                cardLayout.show(mainCardContainer, "SelectCharacter");
+            }else{
+                cardLayout.show(mainCardContainer, "SelectBot");
+            }
         });
         button2.addActionListener(e -> {
             int result = JOptionPane.showConfirmDialog(this,goalsForMatch,"¿Cuantos goles decidiran el partido?",JOptionPane.DEFAULT_OPTION);
@@ -104,7 +108,13 @@ public class MatchOptionsGUI extends JPanel {
 
             int goalsMatch = goalsForMatch.getValue();
             gameGUI.setMatchConfig(GameGUI.MatchType.GOAL, goalsMatch);
+            
+            if (!OptionGamesGUI.getIsBot()){
             cardLayout.show(mainCardContainer, "SelectCharacter");
+            }else{
+                cardLayout.show(mainCardContainer, "SelectBot");
+                
+            }
         });
 
         JButton button4 = new JButton("Volver");

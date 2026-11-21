@@ -10,6 +10,8 @@ import java.awt.event.KeyEvent;
 import java.util.HashSet;
 import java.util.Set;
 import domain.Ball;
+import domain.BasicBot;
+import domain.BotDifficulty;
 import domain.Canada;
 import domain.Brasil;
 import domain.Character;
@@ -23,6 +25,10 @@ import java.awt.geom.Path2D;
 import java.text.Normalizer;
 import java.util.HashMap;
 import java.util.Map;
+import domain.Match;
+import domain.POOBSoccerException;
+import java.io.File;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class GameGUI extends JPanel {
     private static final int KEY_RIGHT_CTRL = -9999;
@@ -32,7 +38,10 @@ public class GameGUI extends JPanel {
     private static final double BOOT_SCALE = 1.0;          // tamaño de la bota 
     private static final boolean SHOW_HITBOX = false;
     public enum MatchType {TIME,GOAL};
+
+
     
+    private BotDifficulty botDifficulty = BotDifficulty.TORPE; 
     private MatchType matchType = MatchType.TIME;
     private int matchValue = 1;
     private final Timer timer;                      
@@ -42,6 +51,8 @@ public class GameGUI extends JPanel {
     private Image ballImage;
     private JButton btnResume;
     private JButton btnMenu;
+    private JButton btnSave;
+    private JButton btnOpen;
     private final Map<String, Image> faces = new HashMap<>();   // país -> imagen de la cara
     private long lastNanos; //Con él se calcula cuánto tiempo pasó entre un tick y el siguiente, para que el juego se mueva a la misma velocidad
     private Character player1 = new Canada();
@@ -108,10 +119,16 @@ public class GameGUI extends JPanel {
 
         btnMenu = createMenuButton("Salir al menú principal");
         btnMenu.addActionListener(e -> cardLayout.show(mainCardContainer, "Menu"));
-
+        btnSave = createMenuButton("Guardar Partida");
+        btnSave.addActionListener(e -> saveGame());
+        btnOpen = createMenuButton("Abrir partida");
+        btnOpen.addActionListener(e-> openGame());
         this.add(btnResume);
         this.add(btnMenu);
-        setPauseMenuVisible(false);
+        this.add(btnOpen);
+        this.add(btnSave);
+
+
 
         // Cada ciclo de ~16 ms: leer teclas, avanzar el dominio y redibujar
         timer = new Timer(16, e -> tick());
@@ -163,10 +180,14 @@ public class GameGUI extends JPanel {
         }
         Field field =new Field(1000, 600, 180);
         Ball ball =new Ball(0, 0);
+
         if (matchType == MatchType.GOAL) {
             match = new GoalMatch(player1, player2, field, ball, matchValue);
         } else {
             match = new TimedMatch(player1, player2, field, ball, matchValue * 60);   // minutos -> segundos
+        }
+        if (OptionGamesGUI.getIsBot()) {
+            match.setBot(1, botDifficulty.createBot());
         }
         faces.clear();
         for (int i = 0; i < 2; i++) {
@@ -230,8 +251,12 @@ public class GameGUI extends JPanel {
      *  Jugador 2: flechas. 
      */
     private void readKeys() {
-        control(0, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_Q);
-        control(1, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KEY_RIGHT_CTRL);
+        if(!match.isBot(0)){
+            control(0, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_Q);
+        }
+        if(!match.isBot(1)){
+            control(1, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KEY_RIGHT_CTRL);
+        }
     }
 
     /**
@@ -593,18 +618,81 @@ public class GameGUI extends JPanel {
     private void setPauseMenuVisible(boolean visible) {
         btnResume.setVisible(visible);
         btnMenu.setVisible(visible);
+        btnSave.setVisible(visible);
+        btnOpen.setVisible(visible);
     }
+
+    private JFileChooser newChooser() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileFilter(new FileNameExtensionFilter("Partida POOBSoccer (*.poob)", "poob"));
+        return chooser;
+    }
+
+    /** Guarda la partida actual (solo se llega aquí desde el menú de pausa). */
+    private void saveGame() {
+        JFileChooser chooser = newChooser();
+        if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
+        File file = chooser.getSelectedFile();
+        if (!file.getName().toLowerCase().endsWith(Match.EXTENSION)) {
+            file = new File(file.getParentFile(), file.getName() + Match.EXTENSION);
+        }
+        try {
+            match.save(file);
+            JOptionPane.showMessageDialog(this, "Partida guardada correctamente.", "Guardar",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (POOBSoccerException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error al guardar", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    public void setBotDifficulty(BotDifficulty difficulty) {
+        if (difficulty != null) {
+            this.botDifficulty = difficulty;
+        }
+    }
+
+    /** Abre una partida guardada; queda en pausa para que el jugador la reanude. */
+    private void openGame() {
+        JFileChooser chooser = newChooser();
+        if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
+        try {
+            Match loaded = Match.open(chooser.getSelectedFile());
+            if (!(loaded instanceof TimedMatch)) {
+                throw new POOBSoccerException(POOBSoccerException.NOT_POOBSccoer_FILE);
+            }
+            match = (TimedMatch) loaded;
+            player1 = match.getPlayer(0);
+            player2 = match.getPlayer(1);
+            faces.clear();
+            for (int i = 0; i < 2; i++) {
+                String country = match.getPlayer(i).getCountry();
+                faces.put(country, loadFace(country));
+            }
+            pressed.clear();
+            lastNanos = System.nanoTime();
+            setPauseMenuVisible(match.isPaused());
+            repaint();
+            setPauseMenuVisible(match.isPaused());
+            repaint();
+            JOptionPane.showMessageDialog(this, "Partida abierta correctamente.", "Abrir",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (POOBSoccerException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error al abrir", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    
 
     @Override
     public void doLayout() {
         super.doLayout();
-        if (btnResume == null || btnMenu == null) return;
-        int bw = 300, bh = 50, gap = 15;
-        int x = (getWidth() - bw) / 2;
+        if (btnResume == null || btnMenu == null || btnSave == null || btnOpen == null) return;
+        int bw = 220, bh = 50, gap = 15;
+        int x = (getWidth() - (2 * bw + gap)) / 2;
         int y = (int) (getHeight() * 0.62);
         btnResume.setBounds(x, y, bw, bh);
-        btnMenu.setBounds(x, y + bh + gap, bw, bh);
+        btnMenu.setBounds(x + bw + gap, y, bw, bh);
+        btnSave.setBounds(x, y + bh + gap, bw, bh);
+        btnOpen.setBounds(x + bw + gap, y + bh + gap, bw, bh);
     }
-
 
 }

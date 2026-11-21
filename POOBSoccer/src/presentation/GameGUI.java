@@ -14,6 +14,10 @@ import domain.BasicBot;
 import domain.BotDifficulty;
 import domain.Canada;
 import domain.Brasil;
+import domain.Cameroon;
+import domain.SouthKorea;
+import domain.Nigeria;
+import domain.UnitedStates;
 import domain.Character;
 import domain.Field;
 import domain.PlayerStats;
@@ -201,7 +205,10 @@ public class GameGUI extends JPanel {
      * Convierte el nombre de un país en el nombre de su archivo de imagen
     */
     private static String key(String country) {
-        return Normalizer.normalize(country, Normalizer.Form.NFD).replaceAll("\\p{M}", "").toLowerCase();
+        return Normalizer.normalize(country, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .replaceAll("\\s+", "")
+                .toLowerCase();
     }
 
     /**
@@ -647,6 +654,34 @@ public class GameGUI extends JPanel {
     public void setBotDifficulty(BotDifficulty difficulty) {
         if (difficulty != null) {
             this.botDifficulty = difficulty;
+
+    /** Abre una partida guardada; queda en pausa para que el jugador la reanude. */
+    private void openGame() {
+        JFileChooser chooser = newChooser();
+        if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
+        try {
+            Match loaded = Match.open(chooser.getSelectedFile());
+            if (!(loaded instanceof TimedMatch)) {
+                throw new POOBSoccerException(POOBSoccerException.NOT_POOBSccoer_FILE);
+            }
+            match = (TimedMatch) loaded;
+            player1 = match.getPlayer(0);
+            player2 = match.getPlayer(1);
+            faces.clear();
+            for (int i = 0; i < 2; i++) {
+                String country = match.getPlayer(i).getCountry();
+                faces.put(country, loadFace(country));
+            }
+            pressed.clear();
+            lastNanos = System.nanoTime();
+            setPauseMenuVisible(match.isPaused());
+            repaint();
+            setPauseMenuVisible(match.isPaused());
+            repaint();
+            JOptionPane.showMessageDialog(this, "Partida abierta correctamente.", "Abrir",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (POOBSoccerException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error al abrir", JOptionPane.ERROR_MESSAGE);
         }
     }
 

@@ -4,7 +4,7 @@ package domain;
  * Progreso de un jugador: sus puntos y el nivel de cada estadística.
  * Aplica a todos los personajes que use el jugador y se conserva de un partido a otro.
  */
-public class PlayerStats {
+public class PlayerStats implements java.io.Serializable {
 
     public enum Stat { SPEED, JUMP, KICK, SURVIVAL }
 

@@ -5,12 +5,16 @@ import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.text.Normalizer;
-import domain.Brasil;
-import domain.Canada;
+import domain.SouthKorea;
+import domain.Cameroon;
+import domain.Nigeria;
+import domain.UnitedStates;
+
+import domain.*;
 import domain.Character;
 
 public class CharacterSelectionGUI extends JPanel {
-    private static final String[] AVAILABLE_CHARACTERS = {"Brasil", "Canada"};
+    private static final String[] AVAILABLE_CHARACTERS = {"Brasil", "Canada","SouthKorea","Cameroon","Nigeria","UnitedStates"};
 
     private int p1Index = 0;
     private int p2Index = 1;
@@ -147,14 +151,19 @@ public class CharacterSelectionGUI extends JPanel {
     private Character instantiateCharacter(String name) {
         switch (name) {
             case "Canada": return new Canada();
+            case "SouthKorea": return new SouthKorea();
+            case "Cameroon": return new Cameroon();
+            case "UnitedStates":return new UnitedStates();
+            case "Nigeria":return new Nigeria();
             case "Brasil":
-            default:       return new Brasil();
+            default: return new Brasil();
         }
     }
 
     private void updateSelection() {
         String c1 = AVAILABLE_CHARACTERS[p1Index];
         String c2 = AVAILABLE_CHARACTERS[p2Index];
+
 
         p1NameLabel.setText("Jugador 1: " + c1);
         p2NameLabel.setText("Jugador 2: " + c2);
@@ -166,8 +175,9 @@ public class CharacterSelectionGUI extends JPanel {
 
     private ImageIcon getFaceIcon(String country) {
         String clean = Normalizer.normalize(country, Normalizer.Form.NFD)
-                                 .replaceAll("\\p{M}", "")
-                                 .toLowerCase();
+                .replaceAll("\\p{M}", "")
+                .replaceAll("\\s+", "")
+                .toLowerCase();
         java.net.URL url = getClass().getResource("/images/" + clean + ".png");
         if (url == null) url = getClass().getResource("/images/face.png");
 

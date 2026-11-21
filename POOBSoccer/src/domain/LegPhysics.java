@@ -1,6 +1,6 @@
 package domain;
 
-public class LegPhysics {
+public class LegPhysics implements java.io.Serializable{
     private static final double REST_ANGLE = 0.6;   // pie en reposo
     private static final double KICK_ANGLE = 2.0;   // pie en lo más alto de la patada
     private static final double BASE_LEG = 55;      // largo de la pierna

@@ -1,6 +1,6 @@
 package domain;
 
-public class Scoreboard {
+public class Scoreboard implements java.io.Serializable{
     private final int[] goals = new int[2];
 
 

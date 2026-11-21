@@ -1,6 +1,6 @@
 package domain;
 
-public interface Bot {
+public interface Bot extends java.io.Serializable {
     /**
      * Decide que va a hacer el personaje.
      * @param match El partido

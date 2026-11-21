@@ -9,7 +9,9 @@ import java.awt.RenderingHints;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 
 /**
  * Pantalla para elegir el tipo de partido.
@@ -26,6 +28,9 @@ public class MatchOptionsGUI extends JPanel {
         "Partido por tiempo: gana quien tenga más goles al acabarse el reloj. Si hay empate, ¡gol de oro!";
     private static final String GOAL_TEXT =
         "Partido por goles: gana el primero que llegue al número de goles acordado.";
+
+
+
 
     private Image backgroundImage;
     private Image imgMatchTime;
@@ -49,6 +54,8 @@ public class MatchOptionsGUI extends JPanel {
         }
         this.setLayout(null);
 
+        int w= getWidth();
+        int h= getHeight();
         java.net.URL url1 = getClass().getResource("/images/TimedMatch.png");
         java.net.URL url2 = getClass().getResource("/images/GoalMatch.png");
 
@@ -61,13 +68,42 @@ public class MatchOptionsGUI extends JPanel {
         button1.setOnHoverChange(this::showDescription);
         button2.setOnHoverChange(this::showDescription);
 
+        //Jsliders
+
+        JSlider timeForMatch = new JSlider(1, 10, 1);
+        timeForMatch.setMajorTickSpacing(1);   
+        timeForMatch.setSnapToTicks(true);     
+        timeForMatch.setPaintTicks(true);      
+        timeForMatch.setPaintLabels(true);
+        timeForMatch.setSize(w/3, h/3);
+
+        JSlider goalsForMatch = new JSlider(1, 15, 3);
+        goalsForMatch.setMajorTickSpacing(1);   
+        goalsForMatch.setSnapToTicks(true);     
+        goalsForMatch.setPaintTicks(true);      
+        goalsForMatch.setPaintLabels(true);
+
         // Elegir el tipo de partido y pasar a la selección de personajes
         button1.addActionListener(e -> {
-            gameGUI.setMatchConfig(GameGUI.MatchType.TIME, DEFAULT_MINUTES);
+            int result = JOptionPane.showConfirmDialog(this,timeForMatch,"¿Cuantos minutos durara el partido?",JOptionPane.DEFAULT_OPTION);
+
+            if (result != JOptionPane.OK_OPTION) {
+                return;  
+            }
+
+            int minutes = timeForMatch.getValue();
+            gameGUI.setMatchConfig(GameGUI.MatchType.TIME, minutes);
             cardLayout.show(mainCardContainer, "SelectCharacter");
         });
         button2.addActionListener(e -> {
-            gameGUI.setMatchConfig(GameGUI.MatchType.GOAL, DEFAULT_GOALS);
+            int result = JOptionPane.showConfirmDialog(this,goalsForMatch,"¿Cuantos goles decidiran el partido?",JOptionPane.DEFAULT_OPTION);
+
+            if (result != JOptionPane.OK_OPTION) {
+                return;   
+            }
+
+            int goalsMatch = goalsForMatch.getValue();
+            gameGUI.setMatchConfig(GameGUI.MatchType.GOAL, goalsMatch);
             cardLayout.show(mainCardContainer, "SelectCharacter");
         });
 

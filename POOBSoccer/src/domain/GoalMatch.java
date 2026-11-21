@@ -13,6 +13,7 @@ public class GoalMatch extends Match {
 
     public void updateMatch(double dt){
         if (!isRunning || isPaused || dt <= 0) return;
+        updateBots(dt);
         int steps = (int) Math.ceil(dt / STEP);
         double h = dt / steps;
         for (int i = 0; i < steps && isRunning; i++) {

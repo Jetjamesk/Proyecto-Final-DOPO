@@ -10,6 +10,8 @@ import java.awt.event.KeyEvent;
 import java.util.HashSet;
 import java.util.Set;
 import domain.Ball;
+import domain.BasicBot;
+import domain.BotDifficulty;
 import domain.Canada;
 import domain.Brasil;
 import domain.Cameroon;
@@ -40,7 +42,10 @@ public class GameGUI extends JPanel {
     private static final double BOOT_SCALE = 1.0;          // tamaño de la bota 
     private static final boolean SHOW_HITBOX = false;
     public enum MatchType {TIME,GOAL};
+
+
     
+    private BotDifficulty botDifficulty = BotDifficulty.TORPE; 
     private MatchType matchType = MatchType.TIME;
     private int matchValue = 1;
     private final Timer timer;                      
@@ -179,10 +184,14 @@ public class GameGUI extends JPanel {
         }
         Field field =new Field(1000, 600, 180);
         Ball ball =new Ball(0, 0);
+
         if (matchType == MatchType.GOAL) {
             match = new GoalMatch(player1, player2, field, ball, matchValue);
         } else {
             match = new TimedMatch(player1, player2, field, ball, matchValue * 60);   // minutos -> segundos
+        }
+        if (OptionGamesGUI.getIsBot()) {
+            match.setBot(1, botDifficulty.createBot());
         }
         faces.clear();
         for (int i = 0; i < 2; i++) {
@@ -249,8 +258,12 @@ public class GameGUI extends JPanel {
      *  Jugador 2: flechas. 
      */
     private void readKeys() {
-        control(0, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_Q);
-        control(1, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KEY_RIGHT_CTRL);
+        if(!match.isBot(0)){
+            control(0, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_Q);
+        }
+        if(!match.isBot(1)){
+            control(1, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KEY_RIGHT_CTRL);
+        }
     }
 
     /**
@@ -638,6 +651,11 @@ public class GameGUI extends JPanel {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error al guardar", JOptionPane.ERROR_MESSAGE);
         }
     }
+    public void setBotDifficulty(BotDifficulty difficulty) {
+        if (difficulty != null) {
+            this.botDifficulty = difficulty;
+        }
+    }
 
     /** Abre una partida guardada; queda en pausa para que el jugador la reanude. */
     private void openGame() {
@@ -669,6 +687,8 @@ public class GameGUI extends JPanel {
         }
     }
 
+    
+
     @Override
     public void doLayout() {
         super.doLayout();
@@ -681,6 +701,5 @@ public class GameGUI extends JPanel {
         btnSave.setBounds(x, y + bh + gap, bw, bh);
         btnOpen.setBounds(x + bw + gap, y + bh + gap, bw, bh);
     }
-
 
 }

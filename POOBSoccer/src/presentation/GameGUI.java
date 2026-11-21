@@ -12,6 +12,10 @@ import java.util.Set;
 import domain.Ball;
 import domain.Canada;
 import domain.Brasil;
+import domain.Cameroon;
+import domain.SouthKorea;
+import domain.Nigeria;
+import domain.UnitedStates;
 import domain.Character;
 import domain.Field;
 import domain.PlayerStats;
@@ -167,7 +171,10 @@ public class GameGUI extends JPanel {
      * Convierte el nombre de un país en el nombre de su archivo de imagen
     */
     private static String key(String country) {
-        return Normalizer.normalize(country, Normalizer.Form.NFD).replaceAll("\\p{M}", "").toLowerCase();
+        return Normalizer.normalize(country, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .replaceAll("\\s+", "")
+                .toLowerCase();
     }
 
     /**

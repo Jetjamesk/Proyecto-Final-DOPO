@@ -80,6 +80,8 @@ public abstract class Match implements Serializable {
     public void resetRound(){
         for (Character p : jugadores){
             p.reset(field);
+            p.restoreHealth();
+            
         } 
         ball.reset(field.getWidth() / 2.0, field.getHeight() * 0.25);
     }
@@ -177,6 +179,13 @@ public abstract class Match implements Serializable {
         }
     }
 
+    protected void updateBots(double dt) {
+        if (!isRunning || isPaused) return;
+        for (int i = 0; i < bots.length; i++) {
+            if (bots[i] != null) bots[i].Decide(this, i, dt);
+        }
+    }
+
     public boolean isRunning()   { return isRunning; }
     public boolean isPaused()    { return isPaused; }
     public Character getWinner() { return winner; }
@@ -184,4 +193,6 @@ public abstract class Match implements Serializable {
     public Ball getBall()        { return ball; }
     public Field getField()      { return field; }
     public Scoreboard getScoreboard() { return scoreboard; }
+    public abstract boolean isGoldenGoal();
+    public abstract double getTimeLeft();
 }

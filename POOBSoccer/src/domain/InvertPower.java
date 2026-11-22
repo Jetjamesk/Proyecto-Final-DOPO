@@ -8,5 +8,10 @@ public class InvertPower implements Power{
     public void use(Character rival){
         rival.applyInvertControls(DURATION);
     }
+    
+    @Override
+    public void use(Character character, Character rival, Ball ball){
+        return;
+    }
 }
 

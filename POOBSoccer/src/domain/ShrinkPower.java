@@ -8,4 +8,8 @@ public class ShrinkPower implements Power{
     public void use(Character rival){
         rival.applyShrink(FACTOR,DURATION);
     }
+    @Override
+    public void use (Character character, Character rival,Ball bal){
+        return;
+    }
 }

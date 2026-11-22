@@ -54,7 +54,7 @@ public abstract class Match implements Serializable {
         if (isRunning && !isPaused) {
             Character user = jugadores.get(player);
             Character rival = jugadores.get(1 - player);
-            user.activateSuper(rival);
+            user.activateSuper(rival,ball);
         }
     }
 

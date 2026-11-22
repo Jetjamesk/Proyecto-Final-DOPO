@@ -19,10 +19,11 @@ public class MatchPhysics implements java.io.Serializable {
         collideCharacters();
         ball.update(h, field);
         for (Character c : characters) {
-            ball.collideWithCircle(c.getX(), c.getY(), c.getRadius(), c.getVx(), c.getVy());
+            boolean bodyTouched = ball.collideWithCircle(c.getX(), c.getY(), c.getRadius(), c.getVx(), c.getVy());
             boolean footTouched = ball.collideWithCircle(c.getFootX(), c.getFootY(), c.getFootRadius(),
-                                   c.getFootVx(), c.getFootVy());
-                                   if (footTouched && c.canLandKick()) c.kickTouchedBall();
+                    c.getFootVx(), c.getFootVy());
+            if (footTouched && c.canLandKick()) c.kickTouchedBall();
+            if (bodyTouched || footTouched) ball.hitBy(c);      // tiro especial contra el rival
         }
         ball.collideWithField(field);
         resolveKicks();

@@ -1,4 +1,4 @@
-
+package presentation;
 
 
 import javax.swing.*;
@@ -24,6 +24,11 @@ import domain.PlayerStats;
 import domain.Match;
 import domain.TimedMatch;
 import domain.GoalMatch;
+import domain.Decoy;
+import domain.Shot;
+import java.util.Random;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.awt.geom.Path2D;
 import java.text.Normalizer;
@@ -33,6 +38,7 @@ import domain.Match;
 import domain.POOBSoccerException;
 import java.io.File;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
 
 public class GameGUI extends JPanel {
     private static final int KEY_RIGHT_CTRL = -9999;
@@ -62,10 +68,14 @@ public class GameGUI extends JPanel {
     private Character player1 = new Canada();
     private Character player2 = new Brasil();
 
+    // Animaciones de los tiros especiales
+    private int animTick;               // contador de cuadros; mueve las animaciones
+    private Shot lastShot;              // para detectar cuándo se lanza un tiro nuevo
+    private int burstFrames;            // cuadros que le quedan a la onda del lanzamiento
+    private double burstX, burstY;
+    private Shot.Type burstType;
 
-
-
-        /**
+    /**
      * Guarda el tipo de partido y su valor elegidos en el menú.
      * @param type  TIME o GOAL
      * @param value minutos si es TIME, goles para ganar si es GOAL
@@ -198,6 +208,8 @@ public class GameGUI extends JPanel {
             String country = match.getPlayer(i).getCountry();
             faces.put(country, loadFace(country));
         }
+        lastShot = null;
+        burstFrames = 0;
         lastNanos = System.nanoTime();
     }
 
@@ -251,8 +263,24 @@ public class GameGUI extends JPanel {
         lastNanos = now;
         readKeys();
         match.updateMatch(dt);
+        if (!match.isPaused()) animTick++;
+        detectLaunch();
+        if (burstFrames > 0) burstFrames--;
         repaint();
     }
+
+    /** Si el balón acaba de salir en tiro especial, arranca la onda de lanzamiento. */
+    private void detectLaunch() {
+        Shot shot = match.getBall().getShot();
+        if (shot != null && shot != lastShot) {
+            burstFrames = 24;
+            burstX = match.getBall().getX();
+            burstY = match.getBall().getY();
+            burstType = shot.getType();
+        }
+        lastShot = shot;
+    }
+
 
     /** Jugador 1: A D W S.
      *  Jugador 2: flechas. 
@@ -301,6 +329,7 @@ public class GameGUI extends JPanel {
         for (int i = 0; i < 2; i++) drawCharacter(g2d, match.getPlayer(i), i, field.getFloorY());
 
         drawBall(g2d);
+        drawLaunchBurst(g2d);
         drawHud(g2d, field);
         drawMessages(g2d, field);
         g2d.dispose();
@@ -397,6 +426,7 @@ public class GameGUI extends JPanel {
         // país sobre la cabeza
         g2d.setFont(new Font("SansSerif", Font.BOLD, 16));
         drawCentered(g2d, c.getCountry(), cx, cy - (int) (r * HEAD_SCALE) - 6, Color.WHITE);
+        drawStatusEffects(g2d, c);
         g2d.setColor(team.darker().darker());
         g2d.setStroke(new BasicStroke((float) (14 * c.getScale()), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g2d.setStroke(new BasicStroke(1));
@@ -433,16 +463,34 @@ public class GameGUI extends JPanel {
      * Dibuja el balon del partido
      * @param g2d
      */
+    /**
+     * Dibuja el balon del partido (y, si va en tiro especial, su animación)
+     */
     private void drawBall(Graphics2D g2d) {
         Ball ball = match.getBall();
-        int d = (int) (ball.getRadius() * 2);
-        int drawX = (int) (ball.getX() - ball.getRadius());
-        int drawY = (int) (ball.getY() - ball.getRadius());
+        Shot shot = ball.getShot();
+        if (shot != null) {
+            for (Decoy d : shot.getDecoys()) {                 // balones falsos de la Ilusión
+                drawShotAura(g2d, Shot.Type.ILLUSION, d.getX(), d.getY(), ball.getRadius(), 0);
+                drawBallAt(g2d, d.getX(), d.getY(), ball.getRadius());
+            }
+            if (shot.isFlying() || !shot.getDecoys().isEmpty()) {
+                drawShotAura(g2d, shot.getType(), ball.getX(), ball.getY(), ball.getRadius(), ball.getVx());
+            }
+        }
+        drawBallAt(g2d, ball.getX(), ball.getY(), ball.getRadius());
+    }
+
+    /** Dibuja una pelota (la real y las falsas se ven exactamente igual). */
+    private void drawBallAt(Graphics2D g2d, double bx, double by, double br) {
+        int d = (int) (br * 2);
+        int drawX = (int) (bx - br);
+        int drawY = (int) (by - br);
 
         if (ballImage != null) {
-            double angle = ball.getX() / ball.getRadius();   // gira al moverse en X
+            double angle = bx / br;                          // gira al moverse en X
             Graphics2D b = (Graphics2D) g2d.create();
-            b.rotate(angle, ball.getX(), ball.getY());       // rota alrededor de su centro
+            b.rotate(angle, bx, by);                         // rota alrededor de su centro
             b.drawImage(ballImage, drawX, drawY, d, d, this);
             b.dispose();
         } else {
@@ -451,6 +499,179 @@ public class GameGUI extends JPanel {
             g2d.setColor(Color.BLACK);
             g2d.drawOval(drawX, drawY, d, d);
         }
+    }
+
+    private static Color shotColor(Shot.Type type) {
+        switch (type) {
+            case AURA:      return new Color(60, 150, 255);
+            case LIGHTNING: return new Color(255, 235, 70);
+            case TORNADO:   return new Color(170, 150, 120);
+            default:        return new Color(190, 90, 255);   // ILLUSION
+        }
+    }
+
+    /** Resplandor: círculos concéntricos translúcidos, más opacos hacia el centro. */
+    private void glow(Graphics2D g2d, double x, double y, double radius, Color c) {
+        for (int i = 4; i >= 1; i--) {
+            double rr = radius * i / 4.0;
+            int alpha = 28 + (4 - i) * 22;
+            g2d.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), Math.min(255, alpha)));
+            g2d.fill(new Ellipse2D.Double(x - rr, y - rr, 2 * rr, 2 * rr));
+        }
+    }
+
+    /** Animación que rodea al balón según el tipo de tiro. */
+    private void drawShotAura(Graphics2D g2d, Shot.Type type, double x, double y, double r, double vx) {
+        double phase = animTick * 0.35;
+        int dir = vx >= 0 ? 1 : -1;
+        Stroke old = g2d.getStroke();
+        Color c = shotColor(type);
+        switch (type) {
+            case AURA:
+            case LIGHTNING:
+                for (int i = 1; i <= 8; i++) {                         // estela detrás del balón
+                    double s = r * (1.05 - i * 0.09);
+                    g2d.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), Math.max(10, 150 - i * 17)));
+                    g2d.fill(new Ellipse2D.Double(x - dir * i * 15 - s, y - s, 2 * s, 2 * s));
+                }
+                glow(g2d, x, y, r * (1.9 + 0.2 * Math.sin(phase)), c);
+                if (type == Shot.Type.LIGHTNING) {                     // rayos que cambian cada 2 cuadros
+                    Random rnd = new Random(animTick / 2 * 7919L);
+                    g2d.setStroke(new BasicStroke(2.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    for (int b = 0; b < 4; b++) {
+                        double ang = rnd.nextDouble() * 2 * Math.PI;
+                        double px = x + Math.cos(ang) * r * 0.8, py = y + Math.sin(ang) * r * 0.8;
+                        for (int k = 0; k < 4; k++) {
+                            double a2 = ang + (rnd.nextDouble() - 0.5) * 1.2;
+                            double nx = px + Math.cos(a2) * r * 0.55, ny = py + Math.sin(a2) * r * 0.55;
+                            g2d.setColor(k % 2 == 0 ? Color.WHITE : new Color(255, 240, 90));
+                            g2d.drawLine((int) px, (int) py, (int) nx, (int) ny);
+                            px = nx;
+                            py = ny;
+                        }
+                    }
+                }
+                break;
+            case TORNADO:
+                for (int i = 0; i < 6; i++) {                          // embudo que gira
+                    double w = r * (1.3 + i * 0.65);
+                    double yy = y + r * 0.9 - i * r * 0.75;
+                    double off = Math.sin(phase * 1.5 + i) * 5;
+                    double start = (phase * 70 + i * 60) % 360;
+                    g2d.setStroke(new BasicStroke(6f - i * 0.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    g2d.setColor(new Color(70, 55, 40, 170));          // contorno oscuro para dar contraste
+                    g2d.draw(new Arc2D.Double(x - w + off, yy - 7, 2 * w, 14, start, 230, Arc2D.OPEN));
+                    g2d.setStroke(new BasicStroke(3.4f - i * 0.3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    g2d.setColor(new Color(240, 230, 205, 235 - i * 15));
+                    g2d.draw(new Arc2D.Double(x - w + off, yy - 7, 2 * w, 14, start, 230, Arc2D.OPEN));
+                }
+                for (int i = 1; i <= 5; i++) {                         // polvo que deja en el suelo
+                    double s = 6 + (animTick + i * 3) % 7;
+                    g2d.setColor(new Color(120, 100, 75, 170 - i * 25));
+                    g2d.fill(new Ellipse2D.Double(x - dir * i * 18 - s, y + r - s, 2 * s, 2 * s));
+                }
+                break;
+            default:                                                    // ILLUSION: halo violeta igual en los 8
+                glow(g2d, x, y, r * (1.6 + 0.15 * Math.sin(phase)), c);
+                break;
+        }
+        g2d.setStroke(old);
+    }
+
+    /** Onda que se expande en el punto donde sale el tiro. */
+    private void drawLaunchBurst(Graphics2D g2d) {
+        if (burstFrames <= 0 || burstType == null) return;
+        double progress = 1 - burstFrames / 24.0;
+        Color c = shotColor(burstType);
+        Stroke old = g2d.getStroke();
+        for (int i = 0; i < 2; i++) {
+            double rr = 26 + (progress - i * 0.15) * 110;
+            if (rr <= 0) continue;
+            int alpha = (int) (Math.max(0, 1 - progress) * 220);
+            g2d.setStroke(new BasicStroke(6f - i * 2));
+            g2d.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), alpha));
+            g2d.draw(new Ellipse2D.Double(burstX - rr, burstY - rr, 2 * rr, 2 * rr));
+        }
+        g2d.setStroke(old);
+    }
+
+    /** Texto centrado con sombra negra, para que se lea sobre cualquier fondo. */
+    private void drawTag(Graphics2D g2d, String text, int cx, int baselineY, Color color) {
+        drawCentered(g2d, text, cx + 1, baselineY + 1, Color.BLACK);
+        drawCentered(g2d, text, cx, baselineY, color);
+    }
+
+    /** Estrella de 5 puntas (para el efecto de inconsciente). */
+    private void drawStar(Graphics2D g2d, double cx, double cy, double rad, Color color) {
+        Path2D star = new Path2D.Double();
+        for (int i = 0; i < 10; i++) {
+            double rr = (i % 2 == 0) ? rad : rad * 0.45;
+            double ang = -Math.PI / 2 + i * Math.PI / 5;
+            double px = cx + Math.cos(ang) * rr, py = cy + Math.sin(ang) * rr;
+            if (i == 0) star.moveTo(px, py); else star.lineTo(px, py);
+        }
+        star.closePath();
+        g2d.setColor(color);
+        g2d.fill(star);
+    }
+
+    /** Efectos que deja un tiro especial sobre el personaje golpeado. */
+    private void drawStatusEffects(Graphics2D g2d, Character c) {
+        int cx = (int) c.getX(), cy = (int) c.getY(), r = (int) c.getRadius();
+        double phase = animTick * 0.25;
+        int labelY = cy - (int) (r * HEAD_SCALE) - 42;
+        Stroke old = g2d.getStroke();
+        g2d.setFont(new Font("SansSerif", Font.BOLD, 13));
+
+        if (c.isPushed()) {                                             // Aura azul: empujado
+            glow(g2d, cx, cy, r * 1.7, new Color(60, 150, 255));
+            int dir = c.getPushDirection();
+            g2d.setStroke(new BasicStroke(3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g2d.setColor(new Color(170, 215, 255, 200));
+            for (int i = 0; i < 5; i++) {                               // rayas de viento
+                int ly = cy - r + i * (2 * r / 4);
+                int lx = cx - dir * (r + 8 + (animTick * 9 + i * 17) % 45);
+                g2d.drawLine(lx, ly, lx - dir * 30, ly);
+            }
+            g2d.setFont(new Font("SansSerif", Font.BOLD, 13));
+            drawTag(g2d, "EMPUJADO", cx, labelY, new Color(120, 190, 255));
+        }
+        if (c.isElectrocuted()) {                                       // Rayo: chispas
+            Random rnd = new Random(animTick / 2 * 104729L);
+            g2d.setStroke(new BasicStroke(2.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            for (int b = 0; b < 6; b++) {
+                double ang = rnd.nextDouble() * 2 * Math.PI;
+                int px = cx + (int) (Math.cos(ang) * r), py = cy + (int) (Math.sin(ang) * r);
+                for (int k = 0; k < 3; k++) {
+                    int nx = px + rnd.nextInt(21) - 10 + (int) (Math.cos(ang) * 8);
+                    int ny = py + rnd.nextInt(21) - 10 + (int) (Math.sin(ang) * 8);
+                    g2d.setColor(k % 2 == 0 ? Color.WHITE : new Color(255, 235, 70));
+                    g2d.drawLine(px, py, nx, ny);
+                    px = nx;
+                    py = ny;
+                }
+            }
+            g2d.setFont(new Font("SansSerif", Font.BOLD, 13));
+            drawTag(g2d, "ELECTROCUTADO", cx, labelY, new Color(255, 235, 70));
+        }
+        if (c.isUnconscious()) {                                        // Tornado: estrellas girando
+            for (int i = 0; i < 3; i++) {
+                double ang = phase + i * 2 * Math.PI / 3;
+                drawStar(g2d, cx + Math.cos(ang) * r * 0.9, cy - r - 18 + Math.sin(ang) * 7, 8, new Color(255, 225, 60));
+            }
+            g2d.setFont(new Font("SansSerif", Font.BOLD, 13));
+            drawTag(g2d, "INCONSCIENTE", cx, labelY, new Color(255, 170, 60));
+        }
+        if (c.isConfused()) {                                           // Ilusión: signos de pregunta
+            g2d.setFont(new Font("SansSerif", Font.BOLD, 28));
+            for (int i = 0; i < 3; i++) {
+                int qy = cy - r - 14 - (int) (6 * Math.sin(phase * 1.5 + i * 1.7));
+                drawTag(g2d, "?", cx - 26 + i * 26, qy, new Color(210, 130, 255));
+            }
+            g2d.setFont(new Font("SansSerif", Font.BOLD, 13));
+            drawTag(g2d, "CONFUNDIDO", cx, labelY, new Color(215, 150, 255));
+        }
+        g2d.setStroke(old);
     }
 
     private void drawHud(Graphics2D g2d, Field field) {
@@ -675,6 +896,8 @@ public class GameGUI extends JPanel {
                 faces.put(country, loadFace(country));
             }
             pressed.clear();
+            lastShot = match.getBall().getShot();
+            burstFrames = 0;
             lastNanos = System.nanoTime();
             setPauseMenuVisible(match.isPaused());
             repaint();
@@ -686,8 +909,6 @@ public class GameGUI extends JPanel {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error al abrir", JOptionPane.ERROR_MESSAGE);
         }
     }
-
-    
 
     @Override
     public void doLayout() {
@@ -703,3 +924,4 @@ public class GameGUI extends JPanel {
     }
 
 }
+

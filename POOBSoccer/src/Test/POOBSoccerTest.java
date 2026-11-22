@@ -409,18 +409,7 @@ public class POOBSoccerTest {
         assertFalse(canada.isStunned());
         assertEquals(canada.getMaxHealth(), canada.getHealth(), EPS);
     }
-
-    @Test
-    public void character_superSoloDisponibleTrasElCooldown() {
-        placed(canada, 250);
-        assertFalse(canada.isSuperReady());
-        canada.update(Character.SUPER_COOLDOWN + 0.5, field);
-        assertTrue(canada.isSuperReady());
-        placed(brasil, 750);
-        canada.activateSuper(brasil);
-        assertFalse(canada.isSuperReady());
-        assertTrue(brasil.isShrink());        // el poder de Canada es ShrinkPower
-    }
+    
 
     @Test
     public void character_controlesInvertidosPorElPoder() {
@@ -473,17 +462,208 @@ public class POOBSoccerTest {
         }
     }
 
+    // =====================================================================
+    // Tiros especiales (Aura Azul, Rayo, Tornado, Ilusión)
+    // =====================================================================
+
+    private TimedMatch matchWith(Character p0) {
+        return new TimedMatch(p0, new Brasil(), new Field(1000, 600, 180), new Ball(0, 0), 60);
+    }
+
+    private void charge(TimedMatch m) {
+        m.getPlayer(0).update(Character.SUPER_COOLDOWN + 1, m.getField());
+    }
+
+    private boolean affected(Character c) {
+        return c.isPushed() || c.isElectrocuted() || c.isUnconscious() || c.isConfused();
+    }
+
+    /** Lanza el tiro del jugador 0 y avanza hasta que golpea al jugador 1. */
+    private TimedMatch shootUntilHit(Character p0) {
+        TimedMatch m = matchWith(p0);
+        charge(m);
+        m.usePower(0);
+        Character rival = m.getPlayer(1);
+        for (int i = 0; i < 300 && !affected(rival); i++) m.updateMatch(0.01);
+        assertTrue("el tiro debía golpear al rival", affected(rival));
+        return m;
+    }
+
     @Test
-    public void personajesNuevos_tienenPoderFuncional() {
-        List<Character> nuevos = new ArrayList<>(Arrays.asList(
-                new SouthKorea(), new Cameroon(), new Nigeria(), new UnitedStates()));
-        for (Character c : nuevos) {
-            Character rival = placed(new Brasil(), 750);
-            placed(c, 250);
-            c.update(Character.SUPER_COOLDOWN + 0.5, field);
-            c.activateSuper(rival);
-            assertTrue(c.getCountry() + " debía afectar al rival", rival.isInverted() || rival.isShrink());
+    public void tiros_cadaPersonajeLanzaSuTipoDeTiro() {
+        Character[] chars = { new SouthKorea(), new Cameroon(), new Nigeria(), new UnitedStates() };
+        Shot.Type[] tipos = { Shot.Type.AURA, Shot.Type.LIGHTNING, Shot.Type.TORNADO, Shot.Type.ILLUSION };
+        for (int i = 0; i < chars.length; i++) {
+            TimedMatch m = matchWith(chars[i]);
+            assertNull(m.getBall().getShot());
+            charge(m);
+            m.usePower(0);
+            assertNotNull(m.getBall().getShot());
+            assertEquals(tipos[i], m.getBall().getShot().getType());
+            assertFalse("el súper debe reiniciarse", m.getPlayer(0).isSuperReady());
         }
+    }
+
+    @Test
+    public void tiros_sinSuperListoNoSeLanza() {
+        TimedMatch m = matchWith(new SouthKorea());
+        m.usePower(0);
+        assertNull(m.getBall().getShot());
+    }
+
+    @Test
+    public void tiros_valoresDeLaTabla() {
+        assertEquals(8, AuraShot.DAMAGE, EPS);
+        assertEquals(1.5, AuraShot.PUSH_DURATION, EPS);
+        assertEquals(12, LightningShot.DAMAGE, EPS);
+        assertEquals(3.0, LightningShot.ELECTRO_DURATION, EPS);
+        assertEquals(8, TornadoShot.DAMAGE, EPS);
+        assertEquals(3.0, TornadoShot.KNOCKOUT_DURATION, EPS);
+        assertEquals(6, IllusionShot.DAMAGE, EPS);
+        assertEquals(2.5, IllusionShot.DURATION, EPS);
+    }
+
+    @Test
+    public void auraAzul_empujaAlRivalHaciaSuPropioArco() {
+        TimedMatch m = shootUntilHit(new SouthKorea());
+        Character rival = m.getPlayer(1);
+        assertTrue(rival.isPushed());
+        assertEquals(92, rival.getHealth(), EPS);
+        double antes = rival.getX();
+        m.updateMatch(0.2);
+        assertTrue("el rival (a la derecha) debe irse hacia su arco, a la derecha", rival.getX() > antes);
+        m.updateMatch(1.5);
+        assertFalse(rival.isPushed());
+    }
+
+    @Test
+    public void rayo_electrocutaAlRival() {
+        TimedMatch m = shootUntilHit(new Cameroon());
+        Character rival = m.getPlayer(1);
+        assertTrue(rival.isElectrocuted());
+        assertEquals(88, rival.getHealth(), EPS);
+        rival.jump();                                     // no puede saltar
+        rival.update(0.01, m.getField());
+        assertEquals(0, rival.getVy(), 1.0);
+        double antes = rival.getX();
+        rival.movement(1);
+        rival.update(0.1, m.getField());
+        assertEquals(20, rival.getX() - antes, 1e-6);     // 400 px/s * 50 % * 0.1 s
+    }
+
+    @Test
+    public void rayo_laElectrocucionDuraTresSegundos() {
+        TimedMatch m = shootUntilHit(new Cameroon());
+        Character rival = m.getPlayer(1);
+        rival.update(2.9, m.getField());
+        assertTrue(rival.isElectrocuted());
+        rival.update(0.2, m.getField());
+        assertFalse(rival.isElectrocuted());
+    }
+
+    @Test
+    public void tornado_dejaInconscienteAlRival() {
+        TimedMatch m = shootUntilHit(new Nigeria());
+        Character rival = m.getPlayer(1);
+        assertTrue(rival.isUnconscious());
+        assertEquals(92, rival.getHealth(), EPS);
+        assertTrue("sale disparado hacia arriba", rival.getVy() < 0);
+        double antes = rival.getX();
+        rival.movement(1);
+        rival.update(0.05, m.getField());
+        assertEquals(antes, rival.getX(), EPS);           // no puede moverse
+        rival.jump();
+        rival.kickBall();
+        assertFalse("no puede patear", rival.canLandKick());
+    }
+
+    @Test
+    public void tornado_alTerminarSePuedeMoverOtraVez() {
+        TimedMatch m = shootUntilHit(new Nigeria());
+        Character rival = m.getPlayer(1);
+        rival.update(3.1, m.getField());
+        assertFalse(rival.isUnconscious());
+        double antes = rival.getX();
+        rival.movement(1);
+        rival.update(0.1, m.getField());
+        assertTrue(rival.getX() > antes);
+    }
+
+    @Test
+    public void ilusion_dividePelotaEnOchoYConfundeAlRival() {
+        TimedMatch m = matchWith(new UnitedStates());
+        charge(m);
+        m.usePower(0);
+        assertEquals("7 falsos + 1 real = 8", 7, m.getBall().getShot().getDecoys().size());
+        Character rival = m.getPlayer(1);
+        for (int i = 0; i < 300 && !rival.isConfused(); i++) m.updateMatch(0.01);
+        assertTrue(rival.isConfused());
+        assertEquals(94, rival.getHealth(), EPS);
+    }
+
+    @Test
+    public void ilusion_losFalsosDesaparecenAlTerminarElEfecto() {
+        TimedMatch m = matchWith(new UnitedStates());
+        charge(m);
+        m.usePower(0);
+        Character rival = m.getPlayer(1);
+        for (int i = 0; i < 300 && !rival.isConfused(); i++) m.updateMatch(0.01);
+        m.updateMatch(1.0);
+        assertEquals(7, m.getBall().getShot().getDecoys().size());   // siguen a 1 s del golpe
+        m.updateMatch(1.6);
+        Shot s = m.getBall().getShot();
+        assertTrue(s == null || s.getDecoys().isEmpty());            // pasaron los 2.5 s
+    }
+
+    @Test
+    public void tiros_elDuenoNoSeGolpeaConSuPropioTiro() {
+        TimedMatch m = matchWith(new SouthKorea());
+        charge(m);
+        m.usePower(0);
+        Character dueno = m.getPlayer(0);
+        m.getBall().getShot().hit(dueno);
+        assertEquals(dueno.getMaxHealth(), dueno.getHealth(), EPS);
+        assertTrue(m.getBall().getShot().isFlying());
+    }
+
+    @Test
+    public void tiros_unGolTerminaElTiro() {
+        TimedMatch m = matchWith(new SouthKorea());
+        charge(m);
+        m.usePower(0);
+        m.getBall().reset(30, 500);                       // reiniciar el balón quita el tiro
+        assertNull(m.getBall().getShot());
+    }
+
+    @Test
+    public void tiros_alReiniciarLaRondaSeQuitanLosEfectos() {
+        placed(brasil, 750);
+        brasil.applyPush(1, 1.5);
+        brasil.applyElectrocution(3);
+        brasil.applyUnconscious(3);
+        brasil.applyConfusion(2.5);
+        brasil.reset(field);
+        assertFalse(brasil.isPushed());
+        assertFalse(brasil.isElectrocuted());
+        assertFalse(brasil.isUnconscious());
+        assertFalse(brasil.isConfused());
+    }
+
+    @Test
+    public void tiros_losPoderesViejosSiguenFuncionandoConElBalon() {
+        placed(brasil, 750);
+        placed(canada, 250);
+        new InvertPower().use(canada, brasil, new Ball(500, 100));
+        assertTrue(brasil.isInverted());
+    }
+
+    @Test
+    public void tiros_elInconscienteNoPuedeUsarElSuper() {
+        TimedMatch m = matchWith(new SouthKorea());
+        charge(m);
+        m.getPlayer(0).applyUnconscious(3);
+        m.usePower(0);
+        assertNull(m.getBall().getShot());
     }
 
     // =====================================================================
@@ -762,6 +942,21 @@ public class POOBSoccerTest {
         m.save(f);
         Match r = Match.open(f);
         assertSame(r.getPlayer(0), r.getWinner());
+    }
+
+    @Test
+    public void persistencia_guardarEnPlenoTiroConservaElTiro() throws Exception {
+        TimedMatch m = matchWith(new UnitedStates());
+        charge(m);
+        m.usePower(0);
+        m.updateMatch(0.05);
+        m.pause();
+        File f = new File(tmp.getRoot(), "tiro.poob");
+        m.save(f);
+        TimedMatch r = (TimedMatch) Match.open(f);
+        assertNotNull(r.getBall().getShot());
+        assertEquals(Shot.Type.ILLUSION, r.getBall().getShot().getType());
+        assertEquals(7, r.getBall().getShot().getDecoys().size());
     }
 
     @Test

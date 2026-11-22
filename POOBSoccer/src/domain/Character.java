@@ -24,6 +24,16 @@ public abstract class Character extends Physics {
     private int facing = 1;             // hacia dónde mira: 1 derecha, -1 izquierda
     private boolean onGround;
 
+    //Efectos de los poderes
+    public static final double PUSH_SPEED = 800.0;            // velocidad al ser empujado
+    public static final double ELECTRO_SPEED_FACTOR = 0.5;    // electrocutado: 50 % de velocidad
+    public static final double KNOCKOUT_LAUNCH = 900.0;       // impulso hacia arriba al quedar inconsciente
+    private double pushTimer = 0.0;
+    private int pushDirection = 0;
+    private double electroTimer = 0.0;
+    private double unconsciousTimer = 0.0;
+    private double confusedTimer = 0.0;
+
     
     private String country;             //Pais
     private final CharacterStats stats = new CharacterStats();
@@ -48,21 +58,15 @@ public abstract class Character extends Physics {
         this.direction = dir;
     }
 
-    /**
-     * Salto del personaje
-     */
     public void jump(){
-        if (onGround&& !isStunned()) {
+        if (onGround && !isStunned() && !isUnconscious() && !isElectrocuted()) {
             vy = -stats.jumpVelocity();
             onGround = false;
         }
     }
 
-    /** Lanza la patada: el pie hace un arco hacia adelante y arriba. 
-     * El golpe lo resuelve la colisión pie-balón. 
-     */
     public void kickBall(){
-        if (!isStunned()){
+        if (!isStunned() && !isUnconscious()){
             leg.kick();
         }
     }
@@ -93,13 +97,37 @@ public abstract class Character extends Physics {
         stunTimer = 0.0;
     }
 
-
-    public void activateSuper(Character rival) {
-        if (isSuperReady()) {
+    /** Versión que también entrega el balón, para los poderes que lo lanzan. */
+    public void activateSuper(Character rival, Ball ball) {
+        if (isSuperReady() && !isUnconscious()) {
             superTimer = 0.0;
-            power.use(rival);
+            power.use(this, rival, ball);
         }
     }
+
+    /** Empujado hacia una dirección (-1 izquierda, 1 derecha) durante duration segundos. */
+    public void applyPush(int dir, double duration) {
+        pushDirection = Integer.signum(dir);
+        pushTimer = duration;
+    }
+
+    /** Electrocutado: no salta y se mueve más lento. */
+    public void applyElectrocution(double duration) {
+        electroTimer = duration;
+    }
+
+    /** Inconsciente: sale disparado al aire y no puede moverse, saltar ni patear. */
+    public void applyUnconscious(double duration) {
+        unconsciousTimer = duration;
+        vy = -KNOCKOUT_LAUNCH;
+        onGround = false;
+    }
+
+    /** Confundido: no sabe cuál es el balón real (efecto de la Ilusión). */
+    public void applyConfusion(double duration) {
+        confusedTimer = duration;
+    }
+
     /**
      * Analiza si el personaje puede aplicar o no el super
      * @return si el tiempo del super ya paso o no
@@ -125,12 +153,9 @@ public abstract class Character extends Physics {
         this.scale = factor;        // Por ejemplo 0.5 para reducir a la mitad
         this.shrinkTimer = duration;
     }
-    
 
 
-    /**
-     *  Física del personaje: avanza dt segundos.
-     */
+
     public void update(double dt, Field field) {
         // 1. Temporizadores de los efectos
         if (shrinkTimer > 0) {
@@ -142,6 +167,10 @@ public abstract class Character extends Physics {
         if (invertTimer > 0) {
             invertTimer = Math.max(0, invertTimer - dt);
         }
+        pushTimer = Math.max(0, pushTimer - dt);
+        electroTimer = Math.max(0, electroTimer - dt);
+        unconsciousTimer = Math.max(0, unconsciousTimer - dt);
+        confusedTimer = Math.max(0, confusedTimer - dt);
         if (stunTimer > 0){
             stunTimer = Math.max(0,stunTimer - dt);
             if(stunTimer == 0) {
@@ -149,7 +178,13 @@ public abstract class Character extends Physics {
             }
         }
         // 2. Física: gravedad y movimiento heredados de Physics
-        vx = isStunned() ? 0 : direction * stats.moveSpeed();;
+        if (isStunned() || isUnconscious()) {
+            vx = 0;
+        } else if (isPushed()) {
+            vx = pushDirection * PUSH_SPEED;
+        } else {
+            vx = direction * stats.moveSpeed() * (isElectrocuted() ? ELECTRO_SPEED_FACTOR : 1.0);
+        }
         integrate(dt);
 
         double r = getRadius();
@@ -164,8 +199,6 @@ public abstract class Character extends Physics {
         }
     }
 
-
-
     /** 
      * Vuelve a su posición inicial (después de un gol o al empezar). 
     */
@@ -173,6 +206,10 @@ public abstract class Character extends Physics {
         invertTimer = 0.0;
         scale = 1.0;
         shrinkTimer = 0.0;
+        pushTimer = 0.0;
+        electroTimer = 0.0;
+        unconsciousTimer = 0.0;
+        confusedTimer = 0.0;
         x = startX;
         y = field.getFloorY() - RADIUS - GAP;
         vx = 0;
@@ -238,6 +275,16 @@ public abstract class Character extends Physics {
     public boolean isShrink(){
         return shrinkTimer > 0;
     }
+
+    public boolean isPushed()       { return pushTimer > 0; }
+
+    public boolean isElectrocuted() { return electroTimer > 0; }
+
+    public boolean isUnconscious()  { return unconsciousTimer > 0; }
+
+    public boolean isConfused()     { return confusedTimer > 0; }
+
+    public int getPushDirection()   { return pushDirection; }
 
     public double getFootX(){
          return leg.getFootX(); 

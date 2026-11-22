@@ -1,19 +1,23 @@
-package presentation;
+
 
 import javax.swing.*;
 import java.awt.*;
 import java.text.Normalizer;
 import java.util.Random;
 import domain.Brasil;
+import domain.Cameroon;
 import domain.Canada;
 import domain.Character;
+import domain.Nigeria;
+import domain.SouthKorea;
+import domain.UnitedStates;
 import domain.BotDifficulty;
 
 public class BotSelectionGUI extends JPanel {
     private int difficultyIndex = 1;
     private final Random random = new Random();
 
-    private static final String[] AVAILABLE_CHARACTERS = {"Brasil", "Canada"};
+    private static final String[] AVAILABLE_CHARACTERS = {"Brasil", "Canada","SouthKorea","Cameroon","Nigeria","UnitedStates"};
     private static final BotDifficulty[] AVAILABLE_DIFFICULTIES = BotDifficulty.values();
 
     private int p1Index = 0;
@@ -167,6 +171,10 @@ public class BotSelectionGUI extends JPanel {
     private Character instantiateCharacter(String name) {
         switch (name) {
             case "Canada": return new Canada();
+            case "SouthKorea": return new SouthKorea();
+            case "Cameroon": return new Cameroon();
+            case "UnitedStates":return new UnitedStates();
+            case "Nigeria":return new Nigeria();
             case "Brasil":
             default:       return new Brasil();
         }

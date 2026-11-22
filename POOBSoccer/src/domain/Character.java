@@ -39,7 +39,7 @@ public abstract class Character extends Physics {
     private final CharacterStats stats = new CharacterStats();
     private double health;
     private final Power power;
-    
+    public Shot ArmedShot= null;
 
     public Character(String country, Power power){
         this.country = country;
@@ -219,6 +219,19 @@ public abstract class Character extends Physics {
         headScale = 1.0;
         leg.reset();
         leg.update(0, x, getHipY(), facing, scale, field.getFloorY());
+        ArmedShot = null;
+    }
+    public void newShot(Shot newShot){
+        ArmedShot = newShot;
+    }
+    public void armShot(Ball ball){
+        if (ArmedShot == null){return;}
+        ball.launch(ArmedShot);
+        ArmedShot = null;
+    }
+
+    public boolean hasArmedShot(){
+        return ArmedShot!=null;
     }
 
     public void superReset(){

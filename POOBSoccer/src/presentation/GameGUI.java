@@ -24,6 +24,8 @@ import domain.TimedMatch;
 import domain.GoalMatch;
 
 import domain.POOBSoccerException;
+import domain.PlayerStats;
+
 import java.io.File;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -45,6 +47,7 @@ public class GameGUI extends JPanel {
     private JButton btnMenu;
     private JButton btnSave;
     private JButton btnOpen;
+    private final PlayerStats[] playerStats = { new PlayerStats(), new PlayerStats() };
 
     private long lastNanos; //Con él se calcula cuánto tiempo pasó entre un tick y el siguiente, para que el juego se mueva a la misma velocidad
     private Character player1 = new Canada();
@@ -156,6 +159,9 @@ public class GameGUI extends JPanel {
         }
         Field field =new Field(1000, 600, 180);
         Ball ball =new Ball(0, 0);
+        
+        player1.setPlayerStats(playerStats[0]);
+        player2.setPlayerStats(playerStats[1]);
 
         if (matchType == MatchType.GOAL) {
             match = new GoalMatch(player1, player2, field, ball, matchValue);
@@ -317,6 +323,10 @@ public class GameGUI extends JPanel {
         btnMenu.setBounds(x + bw + gap, y, bw, bh);
         btnSave.setBounds(x, y + bh + gap, bw, bh);
         btnOpen.setBounds(x + bw + gap, y + bh + gap, bw, bh);
+    }
+
+    public PlayerStats getPlayerStats(int player) {
+        return playerStats[player];
     }
 
 }

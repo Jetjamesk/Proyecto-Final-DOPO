@@ -100,7 +100,7 @@ public class draw {
         lastShot = shot;
     }
 
-    // ===================== Dibujo principal =====================
+    // Dibujo principal 
 
     /**
      * Dibuja el partido completo. La cancha se dibuja en coordenadas lógicas

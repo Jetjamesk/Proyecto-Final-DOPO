@@ -63,6 +63,16 @@ public class BotSelectionGUI extends JPanel {
         btnBack.addActionListener(e -> cardLayout.show(mainContainer, "OptionGames"));
         this.add(btnBack);
 
+        // Back Button
+        JButton btnUpgrade = new JButton("Mejoras");
+        btnUpgrade.setFont(new Font("Wide Latin", Font.ROMAN_BASELINE, 15));
+        btnUpgrade.setForeground(Color.white);
+        btnUpgrade.setBackground(new Color(20,20,20));
+        btnUpgrade.setBounds(40,300,120,35);
+        btnUpgrade.setFocusable(false);
+        btnUpgrade.setBorderPainted(false);
+        btnUpgrade.addActionListener(e -> cardLayout.show(mainContainer, "UpgradeMenu"));
+
         // Player 1 Selector Components
         JButton p1Prev = new JButton("<");
         //Estilo 
@@ -157,6 +167,7 @@ public class BotSelectionGUI extends JPanel {
         
 
         this.add(btnStart);
+        this.add(btnUpgrade);
 
         updateSelection();
     }

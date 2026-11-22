@@ -23,6 +23,7 @@ public class POOBSoccerGUI extends JFrame {
        CharacterSelectionGUI panelSelection = new CharacterSelectionGUI(mainCardContainer, cardLayout, panelGame);
        BotSelectionGUI panelBotSelection = new BotSelectionGUI(mainCardContainer, cardLayout, panelGame);
        MatchOptionsGUI matchOptions = new MatchOptionsGUI(mainCardContainer, cardLayout, panelGame);
+       UpgradeMenu upgradeMenu = new UpgradeMenu(mainCardContainer, cardLayout, panelGame);
        //Aqui se añaden
        mainCardContainer.add(panelMenu, "Menu");
        mainCardContainer.add(panelOptionGames, "OptionGames");
@@ -30,6 +31,7 @@ public class POOBSoccerGUI extends JFrame {
        mainCardContainer.add(panelSelection, "SelectCharacter");
        mainCardContainer.add(panelGame, "Juego");
        mainCardContainer.add(panelBotSelection, "SelectBot");
+       mainCardContainer.add(upgradeMenu, "UpgradeMenu");
        //Aqui mostramos el primero y como mostrarlos en general
        cardLayout.show(mainCardContainer, "Menu");
        

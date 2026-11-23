@@ -65,6 +65,7 @@ public abstract class Match implements Serializable {
         int leader = scoreboard.leader();
         winner = leader < 0 ? null : jugadores.get(leader);
         awardPoints();
+        
     }
     
     /** Informa el resultado a cada jugador; PlayerStats decide cuántos puntos da. */

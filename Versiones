@@ -1,0 +1,36 @@
+Ver 1.
+Planteamiento del proyecto inicial, nos dividimos en los ciclos de fisicas, personajes, menus y cancha
+  fisicas:
+  Fisicas consistio en determinar que es lo que iba a relacionarse con que en el juego dado, con que figuras representariamos todo y, sobre todo, el encontrar
+  una simulacion de las fisicas del balon que lograse cumplir.
+  personajes:
+  Consistio en buscar las imagenes que usariamos para los primeros personajes(Brazil y Canada) y como interactuarian con el entorno t sus poderes.
+  Menus:
+  Encontrar un Layour satisfactorio que lograra el cometido de llevar al usuario entre los paneles sin que su experiencia se sintiese truncada. al final, nos decidimos por un
+  cardLayour y determinamos los primeros paneles necesarios para el juego
+  Cancha:
+  Imagenes y reprentacion grafica de elementos como marcadores o el tiempo restante.
+
+Ver 2.
+Refactorizacion fue uno de los ciclos principales, mediante el cual delegamos a nuevas clases responsabilidades de forma que mantendriamos alta la cohesion del proyecto.
+El ciclo de puntajes, en el que determinamos como se manejarian los puntajes t las mejoras que proveerian a las estadisticas de cada personaje
+Ciclo de vitalidad, donde se añadio la vitalidad de los personajes y su reaccion a las patadas de los rivales.
+Ciclo de nuevos modos, donde se agrego el modo por goles, la opcion de elegir cuantos mminutos y goles duraria un partido, y la pantalla de seleccion de modo de juego
+Ciclo de IA, donde se agrego el bot basico y una interfaz para el modo de arcade o PvsM.
+
+Ver.3 
+Se enfoco en añadir los poderes para los personajes cuyos poderes estuviesen relacionados con el balon, mas especificamente:
+  South Korea: Aura Shoot, un tiro recto que al impactar con el enemigo los manda hacia atras y los aturde
+  Cameroon: Lighting Shoot, tiro rectilineo que al impactar con el enemigo lo electrocuta, reduciendo su movilidad pero permitiendoles patear
+  Nigeria: Tornado Shoot, tiro rectilineo que al pasar cerca del tival lo levanta por los cielos y lo aturde. La intercepcion del balon no evitara que eleven al rival.
+  United States: Ilusion Shoot, tiro el cual crea 7 decoys (o impostores) del balon a la par que es disparado el original. Estos rebotaran por la pantalla confundiendo al rival.
+
+Ver 4.
+Refactorizacion del GameGUI para que el dibujado fuese por separado
+Mejora en los poderes, ahora se activan al colisionar con el personaje salvo Brazil(Invert Power), Canada(Shrink Power)
+Mejora en botones, tamaños ajustados y movidos
+Añadido el apartado de Mejoras, ahora, cada vez que se entre a Character Selection al costado izquierdo se puede encontrar el apartado de mejoras, desde el cual, ambos jugadores pueden gastar sus puntos
+
+
+Que falto:
+Representacion grafica del estado de aturdimiento por patadas, recarga de 10% del super tras recibir un gol, configuracion para la resolucion de la cancha, log de errores.

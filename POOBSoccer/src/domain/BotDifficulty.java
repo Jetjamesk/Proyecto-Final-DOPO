@@ -3,11 +3,11 @@ package domain;
 public enum BotDifficulty {
     TORPE("Torpe") {
         @Override
-        public Bot createBot() { return new BasicBot(0.35); }
+        public Bot createBot() { return new BasicBot(1); }
     },
     DEFENSIVA("Defensiva") {
         @Override
-        public Bot createBot() { return new BasicBot(0.12); }
+        public Bot createBot() { return new DefensiveBot(0.12); }
     },
     OFENSIVA("Ofensiva") {
         @Override

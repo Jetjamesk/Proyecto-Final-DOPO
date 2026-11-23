@@ -11,6 +11,14 @@ public abstract class ShotPower implements Power {
 
     @Override
     public void use(Character user, Character rival, Ball ball) {
-        ball.launch(createShot(user));
+        if (firesOnTouch()){
+            user.newShot(createShot(user));
+        }else{
+            ball.launch(createShot(user));
+        }
     }
+
+
+    protected boolean firesOnTouch() { return false; }
+
 }

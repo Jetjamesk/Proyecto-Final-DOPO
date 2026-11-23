@@ -120,7 +120,7 @@ public class MatchOptionsGUI extends JPanel {
         });
 
         JButton button4 = new JButton("Volver");
-        button4.setBounds(20, 20, 120, 35);
+        button4.setBounds(20, 20, 140, 35);
         button4.setFocusable(false);
         button4.addActionListener(e -> cardLayout.show(mainCardContainer, "OptionGames"));
 

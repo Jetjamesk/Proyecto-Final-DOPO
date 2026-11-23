@@ -11,7 +11,7 @@ public class InvertPower implements Power{
     
     @Override
     public void use(Character character, Character rival, Ball ball){
-        return;
+        use(rival);
     }
 }
 

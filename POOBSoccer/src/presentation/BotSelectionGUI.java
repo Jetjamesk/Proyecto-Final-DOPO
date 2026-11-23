@@ -5,15 +5,19 @@ import java.awt.*;
 import java.text.Normalizer;
 import java.util.Random;
 import domain.Brasil;
+import domain.Cameroon;
 import domain.Canada;
 import domain.Character;
+import domain.Nigeria;
+import domain.SouthKorea;
+import domain.UnitedStates;
 import domain.BotDifficulty;
 
 public class BotSelectionGUI extends JPanel {
     private int difficultyIndex = 1;
     private final Random random = new Random();
 
-    private static final String[] AVAILABLE_CHARACTERS = {"Brasil", "Canada"};
+    private static final String[] AVAILABLE_CHARACTERS = {"Brasil", "Canada","SouthKorea","Cameroon","Nigeria","UnitedStates"};
     private static final BotDifficulty[] AVAILABLE_DIFFICULTIES = BotDifficulty.values();
 
     private int p1Index = 0;
@@ -32,6 +36,8 @@ public class BotSelectionGUI extends JPanel {
     private JButton diffNext;
     private JLabel diffStars;
     private JLabel diffNameLabel;
+
+    private JButton btnUpgrade;
 
     public BotSelectionGUI(JPanel mainContainer, CardLayout cardLayout, GameGUI gameGUI) {
         this.mainContainer = mainContainer;
@@ -53,11 +59,20 @@ public class BotSelectionGUI extends JPanel {
         btnBack.setFont(new Font("Wide Latin", Font.ROMAN_BASELINE, 15));
         btnBack.setForeground(Color.white);
         btnBack.setBackground(new Color(20,20,20));
-        btnBack.setBounds(20, 20, 120, 35);
+        btnBack.setBounds(20, 20, 140, 35);
         btnBack.setFocusable(false);
         btnBack.setBorderPainted(false);
         btnBack.addActionListener(e -> cardLayout.show(mainContainer, "OptionGames"));
         this.add(btnBack);
+
+        // Back Button
+        btnUpgrade = new JButton("Mejoras");
+        btnUpgrade.setFont(new Font("Wide Latin", Font.ROMAN_BASELINE, 15));
+        btnUpgrade.setForeground(Color.white);
+        btnUpgrade.setBackground(new Color(20,20,20));
+        btnUpgrade.setFocusable(false);
+        btnUpgrade.setBorderPainted(false);
+        btnUpgrade.addActionListener(e -> cardLayout.show(mainContainer, "UpgradeMenu"));
 
         // Player 1 Selector Components
         JButton p1Prev = new JButton("<");
@@ -153,6 +168,7 @@ public class BotSelectionGUI extends JPanel {
         
 
         this.add(btnStart);
+        this.add(btnUpgrade);
 
         updateSelection();
     }
@@ -167,6 +183,10 @@ public class BotSelectionGUI extends JPanel {
     private Character instantiateCharacter(String name) {
         switch (name) {
             case "Canada": return new Canada();
+            case "SouthKorea": return new SouthKorea();
+            case "Cameroon": return new Cameroon();
+            case "UnitedStates":return new UnitedStates();
+            case "Nigeria":return new Nigeria();
             case "Brasil":
             default:       return new Brasil();
         }
@@ -245,5 +265,7 @@ public class BotSelectionGUI extends JPanel {
         int btnW = 220;
         int btnH = 50;
         getComponent(9).setBounds((w - btnW) / 2, (int) (h * 0.75), btnW, btnH); // btnStart
+
+        btnUpgrade.setBounds((w-btnW)/8,(int)(h*0.75),160,35);
     }
 }

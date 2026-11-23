@@ -10,6 +10,6 @@ public class ShrinkPower implements Power{
     }
     @Override
     public void use (Character character, Character rival,Ball bal){
-        return;
+        use(rival);
     }
 }

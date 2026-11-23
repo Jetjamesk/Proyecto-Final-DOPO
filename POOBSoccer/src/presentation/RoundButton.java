@@ -21,6 +21,7 @@ public class RoundButton extends JButton {
         setRolloverEnabled(true);
         setForeground(Color.WHITE);
         setFont(new Font("Arial", Font.BOLD, 14));
+        setMargin( new Insets(0, 0, 0, 0));
         setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 

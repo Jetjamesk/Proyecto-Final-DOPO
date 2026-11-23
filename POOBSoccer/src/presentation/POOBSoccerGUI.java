@@ -1,6 +1,10 @@
 package presentation;
 
 import javax.swing.*;
+
+import domain.POOBSoccerException;
+import domain.PlayerStats;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,8 +13,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+
 public class POOBSoccerGUI extends JFrame {
     private POOBSoccerGUI() {
+        
        super("POOBSoccer");
        CardLayout cardLayout = new CardLayout();
        JPanel mainCardContainer = new JPanel(cardLayout);
@@ -23,6 +29,7 @@ public class POOBSoccerGUI extends JFrame {
        CharacterSelectionGUI panelSelection = new CharacterSelectionGUI(mainCardContainer, cardLayout, panelGame);
        BotSelectionGUI panelBotSelection = new BotSelectionGUI(mainCardContainer, cardLayout, panelGame);
        MatchOptionsGUI matchOptions = new MatchOptionsGUI(mainCardContainer, cardLayout, panelGame);
+       UpgradeMenu upgradeMenu = new UpgradeMenu(mainCardContainer, cardLayout, panelGame);
        //Aqui se añaden
        mainCardContainer.add(panelMenu, "Menu");
        mainCardContainer.add(panelOptionGames, "OptionGames");
@@ -30,6 +37,7 @@ public class POOBSoccerGUI extends JFrame {
        mainCardContainer.add(panelSelection, "SelectCharacter");
        mainCardContainer.add(panelGame, "Juego");
        mainCardContainer.add(panelBotSelection, "SelectBot");
+       mainCardContainer.add(upgradeMenu, "UpgradeMenu");
        //Aqui mostramos el primero y como mostrarlos en general
        cardLayout.show(mainCardContainer, "Menu");
        
@@ -76,5 +84,6 @@ public class POOBSoccerGUI extends JFrame {
         
         this.setVisible(true);
      }
+
 
 }

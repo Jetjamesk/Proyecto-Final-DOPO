@@ -16,7 +16,7 @@ public class Decoy implements Serializable {
     }
 
     /** Se mueve en línea recta y rebota en los bordes de la cancha. */
-    void update(double dt, Field field) {
+    public void update(double dt, Field field) {
         x += vx * dt;
         y += vy * dt;
         if (y < radius)                      { y = radius;                          vy = -vy; }

@@ -31,6 +31,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 
 public class GameGUI extends JPanel {
+    private static final File PROGRESS_FILE =
+    new File(System.getProperty("user.home"), "poobsoccer" + PlayerStats.EXTENSION);
+    private PlayerStats[] playerStats;
+    private boolean progressSaved = false; 
     private final draw drawer = new draw();
     private static final int KEY_RIGHT_CTRL = -9999;
     public enum MatchType {TIME,GOAL};
@@ -47,7 +51,6 @@ public class GameGUI extends JPanel {
     private JButton btnMenu;
     private JButton btnSave;
     private JButton btnOpen;
-    private final PlayerStats[] playerStats = { new PlayerStats(), new PlayerStats() };
 
     private long lastNanos; //Con él se calcula cuánto tiempo pasó entre un tick y el siguiente, para que el juego se mueva a la misma velocidad
     private Character player1 = new Canada();
@@ -75,6 +78,8 @@ public class GameGUI extends JPanel {
         this.setLayout(null);
         this.setBackground(Color.BLACK);
         this.setFocusable(true);                    // para recibir las teclas
+
+        loadProgress();   
 
         startMatch();
 
@@ -163,6 +168,8 @@ public class GameGUI extends JPanel {
         player1.setPlayerStats(playerStats[0]);
         player2.setPlayerStats(playerStats[1]);
 
+        progressSaved = false;
+
         if (matchType == MatchType.GOAL) {
             match = new GoalMatch(player1, player2, field, ball, matchValue);
         } else {
@@ -204,6 +211,10 @@ public class GameGUI extends JPanel {
         match.updateMatch(dt);
         drawer.update(match);
         repaint();
+        if (!match.isRunning() && !progressSaved) {
+            saveProgress();
+            progressSaved = true;
+        }
     }
 
     /** Jugador 1: A D W S.
@@ -328,6 +339,34 @@ public class GameGUI extends JPanel {
     public PlayerStats getPlayerStats(int player) {
         return playerStats[player];
     }
+
+        /** Carga el progreso guardado; si no existe (primera vez) o está dañado, empieza de cero. */
+        private void loadProgress() {
+            if (PROGRESS_FILE.isFile()) {
+                try {
+                    PlayerStats[] loaded = PlayerStats.open(PROGRESS_FILE);
+                    if (loaded.length >= 2) {
+                        playerStats = new PlayerStats[]{ loaded[0], loaded[1] };
+                        return;
+                    }
+                } catch (POOBSoccerException ex) {
+                    JOptionPane.showMessageDialog(null, "No se pudo cargar el progreso: " + ex.getMessage(),
+                            "Progreso", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+            playerStats = new PlayerStats[]{ new PlayerStats(), new PlayerStats() };
+        }
+    
+        /** Guarda los puntos y niveles de los dos jugadores. Lo usa también el menú de mejoras. */
+        public void saveProgress() {
+            try {
+                PlayerStats.save(PROGRESS_FILE, playerStats);
+            } catch (POOBSoccerException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Error al guardar el progreso",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    
 
 }
 

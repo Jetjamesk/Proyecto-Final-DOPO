@@ -1,6 +1,10 @@
 package presentation;
 
 import javax.swing.*;
+
+import domain.POOBSoccerException;
+import domain.PlayerStats;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,8 +13,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+
 public class POOBSoccerGUI extends JFrame {
     private POOBSoccerGUI() {
+        
        super("POOBSoccer");
        CardLayout cardLayout = new CardLayout();
        JPanel mainCardContainer = new JPanel(cardLayout);
@@ -78,5 +84,6 @@ public class POOBSoccerGUI extends JFrame {
         
         this.setVisible(true);
      }
+
 
 }

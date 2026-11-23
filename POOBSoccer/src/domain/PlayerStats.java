@@ -1,10 +1,15 @@
 package domain;
 
+import java.io.*;
+
 /**
  * Progreso de un jugador: sus puntos y el nivel de cada estadística.
  * Aplica a todos los personajes que use el jugador y se conserva de un partido a otro.
  */
 public class PlayerStats implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
+    public static final String EXTENSION = ".stats";
+    private static final String HEADER = "POOBSoccer-Stats-";
 
     public enum Stat { SPEED, JUMP, KICK, SURVIVAL }
 
@@ -45,6 +50,32 @@ public class PlayerStats implements java.io.Serializable {
         points -= upgradeCost(stat);
         levels[stat.ordinal()]++;
         return true;
+    }
+    public static void save(File file, PlayerStats[] players) throws POOBSoccerException {
+        if (file == null) throw new POOBSoccerException(POOBSoccerException.FILE_NULL);
+        if (!file.getName().toLowerCase().endsWith(EXTENSION))
+            throw new POOBSoccerException(POOBSoccerException.WRONG_EXTENSION);
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
+            out.writeUTF(HEADER);
+            out.writeObject(players);
+        } catch (IOException e) {
+            throw new POOBSoccerException("No se pudo guardar el progreso: " + e.getMessage());
+        }
+    }
+
+    public static PlayerStats[] open(File file) throws POOBSoccerException {
+        if (file == null) throw new POOBSoccerException(POOBSoccerException.FILE_NULL);
+        if (!file.isFile()) throw new POOBSoccerException(POOBSoccerException.FILE_NOT_FOUND);
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
+            if (!HEADER.equals(in.readUTF()))
+                throw new POOBSoccerException(POOBSoccerException.NOT_POOBSccoer_FILE);
+            Object obj = in.readObject();
+            if (!(obj instanceof PlayerStats[]))
+                throw new POOBSoccerException(POOBSoccerException.NOT_POOBSccoer_FILE);
+            return (PlayerStats[]) obj;
+        } catch (IOException | ClassNotFoundException e) {
+            throw new POOBSoccerException(POOBSoccerException.CORRUPT_DATA);
+        }
     }
 
     public int getLevel(Stat stat) { return levels[stat.ordinal()]; }

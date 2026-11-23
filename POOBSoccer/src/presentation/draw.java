@@ -1,5 +1,6 @@
-import javax.swing.ImageIcon;
+package presentation;
 
+import javax.swing.ImageIcon;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;

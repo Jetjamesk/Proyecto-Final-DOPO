@@ -1,3 +1,5 @@
+package presentation;
+
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 

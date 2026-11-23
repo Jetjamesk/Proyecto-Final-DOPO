@@ -222,7 +222,7 @@ public class UpgradeMenu extends JPanel {
     public void doLayout() {
         int w = getWidth();
         int h = getHeight();
-        btnBack.setBounds(20, 20, 120, 35);
+        btnBack.setBounds(20, 20, 140, 35);
 
         int cw = (int) (w * 0.85);
         int ch = (int) (h * 0.65);

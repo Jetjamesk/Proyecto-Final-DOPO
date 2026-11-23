@@ -37,6 +37,8 @@ public class BotSelectionGUI extends JPanel {
     private JLabel diffStars;
     private JLabel diffNameLabel;
 
+    private JButton btnUpgrade;
+
     public BotSelectionGUI(JPanel mainContainer, CardLayout cardLayout, GameGUI gameGUI) {
         this.mainContainer = mainContainer;
         this.cardLayout = cardLayout;
@@ -57,18 +59,17 @@ public class BotSelectionGUI extends JPanel {
         btnBack.setFont(new Font("Wide Latin", Font.ROMAN_BASELINE, 15));
         btnBack.setForeground(Color.white);
         btnBack.setBackground(new Color(20,20,20));
-        btnBack.setBounds(20, 20, 120, 35);
+        btnBack.setBounds(20, 20, 140, 35);
         btnBack.setFocusable(false);
         btnBack.setBorderPainted(false);
         btnBack.addActionListener(e -> cardLayout.show(mainContainer, "OptionGames"));
         this.add(btnBack);
 
         // Back Button
-        JButton btnUpgrade = new JButton("Mejoras");
+        btnUpgrade = new JButton("Mejoras");
         btnUpgrade.setFont(new Font("Wide Latin", Font.ROMAN_BASELINE, 15));
         btnUpgrade.setForeground(Color.white);
         btnUpgrade.setBackground(new Color(20,20,20));
-        btnUpgrade.setBounds(40,300,120,35);
         btnUpgrade.setFocusable(false);
         btnUpgrade.setBorderPainted(false);
         btnUpgrade.addActionListener(e -> cardLayout.show(mainContainer, "UpgradeMenu"));
@@ -264,5 +265,7 @@ public class BotSelectionGUI extends JPanel {
         int btnW = 220;
         int btnH = 50;
         getComponent(9).setBounds((w - btnW) / 2, (int) (h * 0.75), btnW, btnH); // btnStart
+
+        btnUpgrade.setBounds((w-btnW)/8,(int)(h*0.75),160,35);
     }
 }

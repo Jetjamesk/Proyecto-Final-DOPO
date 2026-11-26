@@ -41,7 +41,8 @@ public class GameGUI extends JPanel {
 
 
     
-    private BotDifficulty botDifficulty = BotDifficulty.TORPE; 
+    private BotDifficulty botDifficulty = BotDifficulty.TORPE;
+    private static final long serialVersionUID = 1L;
     private MatchType matchType = MatchType.TIME;
     private int matchValue = 1;
     private final Timer timer;                      
@@ -307,10 +308,7 @@ public class GameGUI extends JPanel {
         if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
         try {
             Match loaded = Match.open(chooser.getSelectedFile());
-            if (!(loaded instanceof TimedMatch)) {
-                throw new POOBSoccerException(POOBSoccerException.NOT_POOBSccoer_FILE);
-            }
-            match = (TimedMatch) loaded;
+            match = loaded;
             player1 = match.getPlayer(0);
             player2 = match.getPlayer(1);
             drawer.loadFaces(match);        // ← reemplaza el for de faces

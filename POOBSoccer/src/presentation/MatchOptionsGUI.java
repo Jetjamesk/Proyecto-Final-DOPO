@@ -70,52 +70,54 @@ public class MatchOptionsGUI extends JPanel {
         button1.setOnHoverChange(this::showDescription);
         button2.setOnHoverChange(this::showDescription);
 
-        //Jsliders
-
-        JSlider timeForMatch = new JSlider(1, 10, 1);
-        timeForMatch.setMajorTickSpacing(1);   
-        timeForMatch.setSnapToTicks(true);     
-        timeForMatch.setPaintTicks(true);      
-        timeForMatch.setPaintLabels(true);
-
-
-        JSlider goalsForMatch = new JSlider(1, 15, 3);
-        goalsForMatch.setMajorTickSpacing(1);   
-        goalsForMatch.setSnapToTicks(true);     
-        goalsForMatch.setPaintTicks(true);      
-        goalsForMatch.setPaintLabels(true);
 
         // Elegir el tipo de partido y pasar a la selección de personajes
         button1.addActionListener(e -> {
-            int result = JOptionPane.showConfirmDialog(this,timeForMatch,"¿Cuantos minutos durara el partido?",JOptionPane.DEFAULT_OPTION);
+            try{
+                String input = JOptionPane.showInputDialog("Cuanto durara el partido");
 
-            if (result != JOptionPane.OK_OPTION) {
-                return;  
-            }
+                if (input==null){
+                    return;
+                }
 
-            int minutes = timeForMatch.getValue();
-            gameGUI.setMatchConfig(GameGUI.MatchType.TIME, minutes);
-            if (!OptionGamesGUI.getIsBot()){
-                cardLayout.show(mainCardContainer, "SelectCharacter");
-            }else{
-                cardLayout.show(mainCardContainer, "SelectBot");
+                int result = Integer.parseInt(input);
+                if (result<=0 || result>=11){
+                    JOptionPane.showMessageDialog(null, "El partido puede ser desde 1 hasta 10 minutos","Error", JOptionPane.ERROR_MESSAGE);
+                }else{
+                    gameGUI.setMatchConfig(GameGUI.MatchType.TIME, result);
+                    if (!OptionGamesGUI.getIsBot()){
+                        cardLayout.show(mainCardContainer, "SelectCharacter");
+                    }else{
+                        cardLayout.show(mainCardContainer, "SelectBot");
+                    }
+                }
+            }catch(NumberFormatException i){
+                JOptionPane.showMessageDialog(
+                    null, "Debes ingresar numeros enteros","Error",JOptionPane.ERROR_MESSAGE);
             }
         });
         button2.addActionListener(e -> {
-            int result = JOptionPane.showConfirmDialog(this,goalsForMatch,"¿Cuantos goles decidiran el partido?",JOptionPane.DEFAULT_OPTION);
+            try{
+                String input = JOptionPane.showInputDialog("¿Cuantos goles decidiran la victoria?");
 
-            if (result != JOptionPane.OK_OPTION) {
-                return;   
-            }
+                if (input==null){
+                    return;
+                }
 
-            int goalsMatch = goalsForMatch.getValue();
-            gameGUI.setMatchConfig(GameGUI.MatchType.GOAL, goalsMatch);
-            
-            if (!OptionGamesGUI.getIsBot()){
-            cardLayout.show(mainCardContainer, "SelectCharacter");
-            }else{
-                cardLayout.show(mainCardContainer, "SelectBot");
-                
+                int result = Integer.parseInt(input);
+                if (result <=0 || result >=16){
+                    JOptionPane.showMessageDialog(null, "El partido debe ser de 1 hasta 15 goles","Error",JOptionPane.ERROR_MESSAGE);
+                }else{
+                    gameGUI.setMatchConfig(GameGUI.MatchType.GOAL, result);
+                    if (!OptionGamesGUI.getIsBot()){
+                        cardLayout.show(mainCardContainer, "SelectCharacter");
+                    }else{
+                        cardLayout.show(mainCardContainer, "SelectBot");
+                    }
+                }
+            } catch (NumberFormatException i){
+                JOptionPane.showMessageDialog(
+                    null, "Debes ingresar numeros enteros","Error",JOptionPane.ERROR_MESSAGE);
             }
         });
 

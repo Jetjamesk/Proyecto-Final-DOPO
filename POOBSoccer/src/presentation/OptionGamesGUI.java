@@ -66,7 +66,7 @@ public class OptionGamesGUI extends JPanel {
         button2.addActionListener(e ->{ 
             cardLayout.show(mainCardContainer, "MatchOptions");
             isBot = false;
-        });;
+        });
         button1.addActionListener(e -> {
             cardLayout.show(mainCardContainer, "MatchOptions");
             isBot = true;

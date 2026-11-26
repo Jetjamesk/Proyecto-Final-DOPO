@@ -4,7 +4,10 @@ import java.io.Serializable;
 
 /** Balón falso de la Ilusión: solo se dibuja, no choca ni hace daño. */
 public class Decoy implements Serializable {
-    private double x, y, vx, vy;
+    private double x, 
+                   y, 
+                   vx, 
+                   vy;
     private final double radius;
 
     public Decoy(double x, double y, double vx, double vy, double radius) {

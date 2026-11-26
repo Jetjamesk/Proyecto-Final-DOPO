@@ -1,4 +1,4 @@
-package Test;
+package test;
 
 import static org.junit.Assert.*;
 
@@ -79,7 +79,7 @@ public class POOBSoccerTest {
     // =====================================================================
 
     @Test
-    public void ball_resetPonePosicionYQuitaVelocidad() {
+    public void ballResetPonePosicionYQuitaVelocidad() {
         Ball b = new Ball(0, 0);
         b.update(0.1, field);
         b.reset(500, 150);
@@ -90,7 +90,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void ball_laGravedadLaHaceCaer() {
+    public void BallLaGravedadLaHaceCaer() {
         Ball b = new Ball(500, 100);
         b.update(0.1, field);
         assertTrue(b.getY() > 100);
@@ -98,21 +98,21 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void ball_reboteEnElSueloNoLaDejaAtravesar() {
+    public void ballReboteEnElSueloNoLaDejaAtravesar() {
         Ball b = new Ball(500, 545);
         b.update(0.016, field);
         assertTrue(b.getY() + b.getRadius() <= field.getFloorY() + EPS);
     }
 
     @Test
-    public void ball_colisionConCirculoDevuelveTrueSoloSiSeTocan() {
+    public void ballColisionConCirculoDevuelveTrueSoloSiSeTocan() {
         Ball b = new Ball(500, 300);
         assertFalse(b.collideWithCircle(100, 300, 35, 0, 0));
         assertTrue(b.collideWithCircle(520, 300, 35, 0, 0));
     }
 
     @Test
-    public void ball_radioEs20() {
+    public void ballRadioEs20() {
         assertEquals(20, new Ball(0, 0).getRadius(), EPS);
     }
 
@@ -121,21 +121,21 @@ public class POOBSoccerTest {
     // =====================================================================
 
     @Test
-    public void collisions_pelotaNoSaleDeLaCanchaPorLaIzquierda() {
+    public void collisionsPelotaNoSaleDeLaCanchaPorLaIzquierda() {
         Ball b = new Ball(5, 100);              // medio cuerpo fuera de la cancha
         Collisions.bounceOffBounds(b, field, 0.78, 0.95);
         assertEquals(b.getRadius(), b.getX(), EPS);
     }
 
     @Test
-    public void collisions_pelotaRebotaEnElSuelo() {
+    public void collisionsPelotaRebotaEnElSuelo() {
         Ball b = new Ball(500, 545);            // hundida en el suelo
         Collisions.bounceOffBounds(b, field, 0.78, 0.95);
         assertEquals(field.getFloorY() - b.getRadius(), b.getY(), EPS);
     }
 
     @Test
-    public void collisions_bounceOffCircleSeparaLosCuerpos() {
+    public void collisionsBounceOffCircleSeparaLosCuerpos() {
         Ball b = new Ball(500, 300);
         assertTrue(Collisions.bounceOffCircle(b, 0.78, 520, 300, 35, 0, 0));
         double dist = Math.hypot(b.getX() - 520, b.getY() - 300);
@@ -143,14 +143,14 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void collisions_bounceOffCircleSinContactoNoHaceNada() {
+    public void collisionsBounceOffCircleSinContactoNoHaceNada() {
         Ball b = new Ball(100, 100);
         assertFalse(Collisions.bounceOffCircle(b, 0.78, 800, 300, 35, 0, 0));
         assertEquals(100, b.getX(), EPS);
     }
 
     @Test
-    public void collisions_travesanoDevuelveLaPelotaPorEncima() {
+    public void collisionsTravesanoDevuelveLaPelotaPorEncima() {
         double top = field.getGoalTopY();
         Ball b = new Ball(40, top - 5);   // pegada al travesaño izquierdo
         Collisions.bounceOffCrossbars(b, field, 0.78);
@@ -162,28 +162,28 @@ public class POOBSoccerTest {
     // =====================================================================
 
     @Test
-    public void field_alturaDelSueloYDelTravesano() {
+    public void fieldAlturaDelSueloYDelTravesano() {
         assertEquals(550, field.getFloorY());
         assertEquals(370, field.getGoalTopY());
     }
 
     @Test
-    public void field_golEnElArcoIzquierdo() {
+    public void fieldGolEnElArcoIzquierdo() {
         assertEquals(0, field.goalConcededBy(new Ball(30, 500)));
     }
 
     @Test
-    public void field_golEnElArcoDerecho() {
+    public void fieldGolEnElArcoDerecho() {
         assertEquals(1, field.goalConcededBy(new Ball(970, 500)));
     }
 
     @Test
-    public void field_centroDeCanchaNoEsGol() {
+    public void fieldCentroDeCanchaNoEsGol() {
         assertEquals(-1, field.goalConcededBy(new Ball(500, 500)));
     }
 
     @Test
-    public void field_porEncimaDelTravesanoNoEsGol() {
+    public void fieldPorEncimaDelTravesanoNoEsGol() {
         assertEquals(-1, field.goalConcededBy(new Ball(30, 300)));
     }
 
@@ -192,7 +192,7 @@ public class POOBSoccerTest {
     // =====================================================================
 
     @Test
-    public void scoreboard_inicioEnCerosYEmpatado() {
+    public void scoreboardInicioEnCerosYEmpatado() {
         Scoreboard s = new Scoreboard();
         assertEquals(0, s.getGoals(0));
         assertEquals(0, s.getGoals(1));
@@ -200,7 +200,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void scoreboard_golRecibidoEsPuntoDelRival() {
+    public void scoreboardGolRecibidoEsPuntoDelRival() {
         Scoreboard s = new Scoreboard();
         s.goalConcededBy(0);
         assertEquals(0, s.getGoals(0));
@@ -208,7 +208,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void scoreboard_lideresYEmpate() {
+    public void scoreboardLideresYEmpate() {
         Scoreboard s = new Scoreboard();
         assertEquals(-1, s.leader());
         s.goalConcededBy(1);
@@ -223,7 +223,7 @@ public class POOBSoccerTest {
     // =====================================================================
 
     @Test
-    public void playerStats_inicioNivel1SinPuntos() {
+    public void playerStatsInicioNivel1SinPuntos() {
         PlayerStats p = new PlayerStats();
         assertEquals(0, p.getPoints());
         for (PlayerStats.Stat s : PlayerStats.Stat.values()) {
@@ -232,7 +232,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void playerStats_recompensaPorPartido() {
+    public void playerStatsRecompensaPorPartido() {
         PlayerStats p = new PlayerStats();
         p.rewardMatch(true);
         assertEquals(PlayerStats.WIN_POINTS, p.getPoints());
@@ -241,14 +241,14 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void playerStats_noMejoraSinPuntos() {
+    public void playerStatsNoMejoraSinPuntos() {
         PlayerStats p = new PlayerStats();
         assertFalse(p.upgrade(PlayerStats.Stat.SPEED));
         assertEquals(1, p.getLevel(PlayerStats.Stat.SPEED));
     }
 
     @Test
-    public void playerStats_mejoraGastaPuntosYDuplicaElCosto() {
+    public void playerStatsMejoraGastaPuntosYDuplicaElCosto() {
         PlayerStats p = new PlayerStats();
         p.addPoints(500);
         assertEquals(500, p.upgradeCost(PlayerStats.Stat.JUMP));
@@ -259,7 +259,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void playerStats_nivelMaximoEs10YPuntosNegativosSeIgnoran() {
+    public void playerStatsNivelMaximoEs10YPuntosNegativosSeIgnoran() {
         PlayerStats p = new PlayerStats();
         p.addPoints(-50);
         assertEquals(0, p.getPoints());
@@ -274,7 +274,7 @@ public class POOBSoccerTest {
     // =====================================================================
 
     @Test
-    public void characterStats_valoresBaseConNivel1() {
+    public void characterStatsValoresBaseConNivel1() {
         CharacterStats s = new CharacterStats();
         assertEquals(400, s.moveSpeed(), EPS);
         assertEquals(700, s.jumpVelocity(), EPS);
@@ -283,7 +283,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void characterStats_mejorarVelocidadSubeUn10Porciento() {
+    public void characterStatsMejorarVelocidadSubeUn10Porciento() {
         PlayerStats p = new PlayerStats();
         p.addPoints(500);
         p.upgrade(PlayerStats.Stat.SPEED);
@@ -293,7 +293,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void characterStats_mejorarVidaYPatada() {
+    public void characterStatsMejorarVidaYPatada() {
         PlayerStats p = new PlayerStats();
         p.addPoints(1000);
         p.upgrade(PlayerStats.Stat.SURVIVAL);
@@ -305,7 +305,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void characterStats_progresoNuloCreaUnoNuevo() {
+    public void characterStatsProgresoNuloCreaUnoNuevo() {
         CharacterStats s = new CharacterStats();
         s.setProgress(null);
         assertNotNull(s.getProgress());
@@ -317,7 +317,7 @@ public class POOBSoccerTest {
     // =====================================================================
 
     @Test
-    public void leg_patearActivaLaPatadaYTermina() {
+    public void legPatearActivaLaPatadaYTermina() {
         LegPhysics leg = new LegPhysics();
         assertFalse(leg.isKicking());
         leg.kick();
@@ -327,7 +327,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void leg_marcarGolpeYReiniciarEnNuevaPatada() {
+    public void legMarcarGolpeYReiniciarEnNuevaPatada() {
         LegPhysics leg = new LegPhysics();
         leg.kick();
         leg.markHit();
@@ -338,7 +338,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void leg_resetDetienePatada() {
+    public void legResetDetienePatada() {
         LegPhysics leg = new LegPhysics();
         leg.kick();
         leg.markHit();
@@ -348,7 +348,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void leg_elPieSeColocaSegunHaciaDondeMira() {
+    public void legElPieSeColocaSegunHaciaDondeMira() {
         LegPhysics der = new LegPhysics();
         der.update(0, 500, 300, 1, 1.0, 550);
         assertTrue(der.getFootX() > 500);
@@ -358,7 +358,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void leg_elPieNuncaAtraviesaElSuelo() {
+    public void legElPieNuncaAtraviesaElSuelo() {
         LegPhysics leg = new LegPhysics();
         leg.update(0, 500, 540, 1, 1.0, 550);
         assertTrue(leg.getFootY() <= 550 + EPS);
@@ -369,7 +369,7 @@ public class POOBSoccerTest {
     // =====================================================================
 
     @Test
-    public void character_resetLoDejaEnElSueloEnSuPosicionInicial() {
+    public void characterResetLoDejaEnElSueloEnSuPosicionInicial() {
         placed(canada, 250);
         assertEquals(250, canada.getX(), EPS);
         assertEquals(0, canada.getVx(), EPS);
@@ -377,7 +377,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void character_semueveALaDerechaSegunSuVelocidad() {
+    public void characterSemueveALaDerechaSegunSuVelocidad() {
         placed(canada, 250);
         canada.movement(1);
         canada.update(0.1, field);
@@ -385,7 +385,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void character_noSalteEnElAire() {
+    public void characterNoSalteEnElAire() {
         placed(canada, 250);
         canada.jump();
         canada.update(0.01, field);
@@ -396,7 +396,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void character_danoYAturdimiento() {
+    public void characterDanoYAturdimiento() {
         placed(canada, 250);
         canada.takeDamage(10);
         assertEquals(90, canada.getHealth(), EPS);
@@ -412,7 +412,7 @@ public class POOBSoccerTest {
     
 
     @Test
-    public void character_controlesInvertidosPorElPoder() {
+    public void characterControlesInvertidosPorElPoder() {
         placed(brasil, 500);
         new InvertPower().use(brasil);
         assertTrue(brasil.isInverted());
@@ -422,7 +422,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void character_encogimientoReduceElRadioYTermina() {
+    public void characterEncogimientoReduceElRadioYTermina() {
         placed(brasil, 500);
         double normal = brasil.getRadius();
         new ShrinkPower().use(brasil);
@@ -433,7 +433,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void character_facingNuncaEsCero() {
+    public void characterFacingNuncaEsCero() {
         canada.setFacing(0);
         assertEquals(1, canada.getFacing());
         canada.setFacing(-5);
@@ -441,7 +441,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void character_cadaPersonajeTieneSuPais() {
+    public void characterCadaPersonajeTieneSuPais() {
         assertEquals("Canada", canada.getCountry());
         assertEquals("Brasil", brasil.getCountry());
     }
@@ -451,7 +451,7 @@ public class POOBSoccerTest {
     // =====================================================================
 
     @Test
-    public void personajesNuevos_seCreanConPaisYEstadisticasBase() {
+    public void personajesNuevosSeCreanConPaisYEstadisticasBase() {
         List<Character> nuevos = new ArrayList<>(Arrays.asList(
                 new SouthKorea(), new Cameroon(), new Nigeria(), new UnitedStates()));
         for (Character c : nuevos) {
@@ -490,7 +490,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void tiros_cadaPersonajeLanzaSuTipoDeTiro() {
+    public void tirosCadaPersonajeLanzaSuTipoDeTiro() {
         Character[] chars = { new SouthKorea(), new Cameroon(), new Nigeria(), new UnitedStates() };
         Shot.Type[] tipos = { Shot.Type.AURA, Shot.Type.LIGHTNING, Shot.Type.TORNADO, Shot.Type.ILLUSION };
         for (int i = 0; i < chars.length; i++) {
@@ -505,14 +505,14 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void tiros_sinSuperListoNoSeLanza() {
+    public void tirosSinSuperListoNoSeLanza() {
         TimedMatch m = matchWith(new SouthKorea());
         m.usePower(0);
         assertNull(m.getBall().getShot());
     }
 
     @Test
-    public void tiros_valoresDeLaTabla() {
+    public void tirosValoresDeLaTabla() {
         assertEquals(8, AuraShot.DAMAGE, EPS);
         assertEquals(1.5, AuraShot.PUSH_DURATION, EPS);
         assertEquals(12, LightningShot.DAMAGE, EPS);
@@ -524,7 +524,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void auraAzul_empujaAlRivalHaciaSuPropioArco() {
+    public void auraAzulEmpujaAlRivalHaciaSuPropioArco() {
         TimedMatch m = shootUntilHit(new SouthKorea());
         Character rival = m.getPlayer(1);
         assertTrue(rival.isPushed());
@@ -537,7 +537,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void rayo_electrocutaAlRival() {
+    public void rayoElectrocutaAlRival() {
         TimedMatch m = shootUntilHit(new Cameroon());
         Character rival = m.getPlayer(1);
         assertTrue(rival.isElectrocuted());
@@ -552,7 +552,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void rayo_laElectrocucionDuraTresSegundos() {
+    public void rayoLaElectrocucionDuraTresSegundos() {
         TimedMatch m = shootUntilHit(new Cameroon());
         Character rival = m.getPlayer(1);
         rival.update(2.9, m.getField());
@@ -562,7 +562,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void tornado_dejaInconscienteAlRival() {
+    public void tornadoDejaInconscienteAlRival() {
         TimedMatch m = shootUntilHit(new Nigeria());
         Character rival = m.getPlayer(1);
         assertTrue(rival.isUnconscious());
@@ -578,7 +578,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void tornado_alTerminarSePuedeMoverOtraVez() {
+    public void tornadoAlTerminarSePuedeMoverOtraVez() {
         TimedMatch m = shootUntilHit(new Nigeria());
         Character rival = m.getPlayer(1);
         rival.update(3.1, m.getField());
@@ -590,7 +590,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void ilusion_dividePelotaEnOchoYConfundeAlRival() {
+    public void ilusionDividePelotaEnOchoYConfundeAlRival() {
         TimedMatch m = matchWith(new UnitedStates());
         charge(m);
         m.usePower(0);
@@ -602,7 +602,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void ilusion_losFalsosDesaparecenAlTerminarElEfecto() {
+    public void ilusionLosFalsosDesaparecenAlTerminarElEfecto() {
         TimedMatch m = matchWith(new UnitedStates());
         charge(m);
         m.usePower(0);
@@ -616,7 +616,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void tiros_elDuenoNoSeGolpeaConSuPropioTiro() {
+    public void tirosElDuenoNoSeGolpeaConSuPropioTiro() {
         TimedMatch m = matchWith(new SouthKorea());
         charge(m);
         m.usePower(0);
@@ -627,7 +627,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void tiros_unGolTerminaElTiro() {
+    public void tirosUnGolTerminaElTiro() {
         TimedMatch m = matchWith(new SouthKorea());
         charge(m);
         m.usePower(0);
@@ -636,7 +636,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void tiros_alReiniciarLaRondaSeQuitanLosEfectos() {
+    public void tirosAlReiniciarLaRondaSeQuitanLosEfectos() {
         placed(brasil, 750);
         brasil.applyPush(1, 1.5);
         brasil.applyElectrocution(3);
@@ -650,7 +650,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void tiros_losPoderesViejosSiguenFuncionandoConElBalon() {
+    public void tirosLosPoderesViejosSiguenFuncionandoConElBalon() {
         placed(brasil, 750);
         placed(canada, 250);
         new InvertPower().use(canada, brasil, new Ball(500, 100));
@@ -658,7 +658,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void tiros_elInconscienteNoPuedeUsarElSuper() {
+    public void tirosElInconscienteNoPuedeUsarElSuper() {
         TimedMatch m = matchWith(new SouthKorea());
         charge(m);
         m.getPlayer(0).applyUnconscious(3);
@@ -671,14 +671,14 @@ public class POOBSoccerTest {
     // =====================================================================
 
     @Test
-    public void power_invertPowerInvierteAlRival() {
+    public void powerInvertPowerInvierteAlRival() {
         placed(brasil, 500);
         new InvertPower().use(brasil);
         assertTrue(brasil.isInverted());
     }
 
     @Test
-    public void power_shrinkPowerEncogeAlRival() {
+    public void powerShrinkPowerEncogeAlRival() {
         placed(brasil, 500);
         new ShrinkPower().use(brasil);
         assertTrue(brasil.isShrink());
@@ -686,7 +686,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void power_elEfectoDeInvertirDuraSeisSegundos() {
+    public void powerElEfectoDeInvertirDuraSeisSegundos() {
         placed(brasil, 500);
         new InvertPower().use(brasil);
         brasil.update(5.9, field);
@@ -700,7 +700,7 @@ public class POOBSoccerTest {
     // =====================================================================
 
     @Test
-    public void matchPhysics_losPersonajesNoSeAtraviesan() {
+    public void matchPhysicsLosPersonajesNoSeAtraviesan() {
         Character a = placed(new Canada(), 500);
         Character b = placed(new Brasil(), 500);   // mismo punto a propósito
         MatchPhysics world = new MatchPhysics(field, new Ball(500, 100), Arrays.asList(a, b));
@@ -710,7 +710,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void matchPhysics_laPelotaCaeConLaGravedad() {
+    public void matchPhysicsLaPelotaCaeConLaGravedad() {
         Character a = placed(new Canada(), 250);
         Character b = placed(new Brasil(), 750);
         Ball ball = new Ball(500, 100);
@@ -720,7 +720,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void matchPhysics_laPelotaTocandoElCuerpoSeSepara() {
+    public void matchPhysicsLaPelotaTocandoElCuerpoSeSepara() {
         Character a = placed(new Canada(), 250);
         Character b = placed(new Brasil(), 750);
         Ball ball = new Ball(a.getX() + 10, a.getY());   // metida dentro de la cabeza
@@ -735,7 +735,7 @@ public class POOBSoccerTest {
     // =====================================================================
 
     @Test
-    public void match_alCrearseUbicaAJugadoresYBalon() {
+    public void matchAlCrearseUbicaAJugadoresYBalon() {
         TimedMatch m = newMatch(60);
         assertTrue(m.isRunning());
         assertFalse(m.isPaused());
@@ -747,7 +747,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void match_enPausaNoAvanzaElTiempo() {
+    public void matchEnPausaNoAvanzaElTiempo() {
         TimedMatch m = newMatch(60);
         m.pause();
         assertTrue(m.isPaused());
@@ -759,7 +759,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void match_enPausaIgnoraLasOrdenes() {
+    public void matchEnPausaIgnoraLasOrdenes() {
         TimedMatch m = newMatch(60);
         m.pause();
         m.move(0, 1);
@@ -768,7 +768,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void match_finalizarDeclaraGanadorYDaPuntosUnaSolaVez() {
+    public void matchFinalizarDeclaraGanadorYDaPuntosUnaSolaVez() {
         TimedMatch m = newMatch(60);
         m.getScoreboard().goalConcededBy(1);     // anota el jugador 0
         m.endMatch();
@@ -780,7 +780,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void match_empateNoTieneGanador() {
+    public void matchEmpateNoTieneGanador() {
         TimedMatch m = newMatch(60);
         m.endMatch();
         assertNull(m.getWinner());
@@ -788,7 +788,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void match_usarPoderSoloConElSuperListo() {
+    public void matchUsarPoderSoloConElSuperListo() {
         TimedMatch m = newMatch(60);
         m.usePower(0);                           // aún no está listo
         assertFalse(m.getPlayer(1).isShrink());
@@ -802,7 +802,7 @@ public class POOBSoccerTest {
     // =====================================================================
 
     @Test
-    public void timedMatch_empateAlAcabarElTiempoActivaGolDeOro() {
+    public void timedMatchEmpateAlAcabarElTiempoActivaGolDeOro() {
         TimedMatch m = newMatch(1);
         m.updateMatch(1.0);
         assertTrue(m.isGoldenGoal());
@@ -810,7 +810,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void timedMatch_conVentajaAlAcabarElTiempoTerminaYGana() {
+    public void timedMatchConVentajaAlAcabarElTiempoTerminaYGana() {
         TimedMatch m = newMatch(1);
         m.getScoreboard().goalConcededBy(1);
         m.updateMatch(1.0);
@@ -819,7 +819,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void timedMatch_golSumaPuntoYReiniciaLaRonda() {
+    public void timedMatchGolSumaPuntoYReiniciaLaRonda() {
         TimedMatch m = newMatch(60);
         m.getBall().reset(30, 500);              // dentro del arco izquierdo
         m.updateMatch(0.01);
@@ -829,7 +829,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void timedMatch_golDeOroTerminaElPartido() {
+    public void timedMatchGolDeOroTerminaElPartido() {
         TimedMatch m = newMatch(1);
         m.updateMatch(1.0);                      // empate -> gol de oro
         m.getBall().reset(970, 500);             // gol en el arco derecho
@@ -843,7 +843,7 @@ public class POOBSoccerTest {
     // =====================================================================
 
     @Test
-    public void goalMatch_terminaAlLlegarALosGolesObjetivo() {
+    public void goalMatchTerminaAlLlegarALosGolesObjetivo() {
         GoalMatch m = new GoalMatch(new Canada(), new Brasil(), new Field(1000, 600, 180), new Ball(0, 0), 2);
         m.getBall().reset(970, 500);
         m.updateMatch(0.01);
@@ -856,7 +856,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void goalMatch_enPausaNoProcesaGoles() {
+    public void goalMatchEnPausaNoProcesaGoles() {
         GoalMatch m = new GoalMatch(new Canada(), new Brasil(), new Field(1000, 600, 180), new Ball(0, 0), 1);
         m.pause();
         m.getBall().reset(970, 500);
@@ -869,7 +869,7 @@ public class POOBSoccerTest {
     // =====================================================================
 
     @Test
-    public void bot_seMueveHaciaElBalon() {
+    public void botSeMueveHaciaElBalon() {
         TimedMatch m = newMatch(60);
         m.setBot(0, new BasicBot(0));
         assertTrue(m.isBot(0));
@@ -880,20 +880,20 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void bot_usaElPoderCuandoEstaListo() {
+    public void botUsaElPoderCuandoEstaListo() {
         TimedMatch m = newMatch(60);
         m.getPlayer(0).update(Character.SUPER_COOLDOWN + 1, m.getField());
-        new BasicBot(0).Decide(m, 0, 0.016);
+        new BasicBot(0).decide(m, 0, 0.016);
         assertTrue(m.getPlayer(1).isShrink());
     }
 
     @Test
-    public void bot_noReaccionaAntesDeSuTiempoDePensar() {
+    public void botNoReaccionaAntesDeSuTiempoDePensar() {
         TimedMatch m = newMatch(60);
         BasicBot bot = new BasicBot(5.0);
-        bot.Decide(m, 0, 0.016);                 // primera decisión: sí actúa
+        bot.decide(m, 0, 0.016);                 // primera decisión: sí actúa
         m.getPlayer(0).update(Character.SUPER_COOLDOWN + 1, m.getField());
-        bot.Decide(m, 0, 0.016);                 // aún "piensa": no usa el poder
+        bot.decide(m, 0, 0.016);                 // aún "piensa": no usa el poder
         assertFalse(m.getPlayer(1).isShrink());
     }
 
@@ -902,7 +902,7 @@ public class POOBSoccerTest {
     // =====================================================================
 
     @Test
-    public void persistencia_guardarYAbrirConservaElEstado() throws Exception {
+    public void persistenciaGuardarYAbrirConservaElEstado() throws Exception {
         TimedMatch m = newMatch(60);
         m.setBot(1, new BasicBot(0.2));
         m.getScoreboard().goalConcededBy(1);
@@ -923,7 +923,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void persistencia_laPartidaAbiertaSePuedeSeguirJugando() throws Exception {
+    public void persistenciaLaPartidaAbiertaSePuedeSeguirJugando() throws Exception {
         TimedMatch m = newMatch(60);
         m.updateMatch(1.0);
         File f = new File(tmp.getRoot(), "seguir.poob");
@@ -934,7 +934,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void persistencia_elGanadorSigueSiendoUnoDeLosJugadores() throws Exception {
+    public void persistenciaElGanadorSigueSiendoUnoDeLosJugadores() throws Exception {
         TimedMatch m = newMatch(60);
         m.getScoreboard().goalConcededBy(1);
         m.endMatch();
@@ -945,7 +945,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void persistencia_guardarEnPlenoTiroConservaElTiro() throws Exception {
+    public void persistenciaGuardarEnPlenoTiroConservaElTiro() throws Exception {
         TimedMatch m = matchWith(new UnitedStates());
         charge(m);
         m.usePower(0);
@@ -960,27 +960,27 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void persistencia_extensionIncorrecta() throws Exception {
+    public void persistenciaExtensionIncorrecta() throws Exception {
         File f = tmp.newFile("partida.txt");
         assertMessage(POOBSoccerException.WRONG_EXTENSION, opening(f));
         assertMessage(POOBSoccerException.WRONG_EXTENSION, saving(newMatch(60), f));
     }
 
     @Test
-    public void persistencia_archivoNuloOInexistente() {
+    public void persistenciaArchivoNuloOInexistente() {
         assertMessage(POOBSoccerException.FILE_NULL, opening(null));
         assertMessage(POOBSoccerException.FILE_NULL, saving(newMatch(60), null));
         assertMessage(POOBSoccerException.FILE_NOT_FOUND, opening(new File(tmp.getRoot(), "no_existe.poob")));
     }
 
     @Test
-    public void persistencia_archivoVacio() throws Exception {
+    public void persistenciaArchivoVacio() throws Exception {
         File f = tmp.newFile("vacio.poob");
         assertMessage(POOBSoccerException.FILE_EMPTY, opening(f));
     }
 
     @Test
-    public void persistencia_archivoQueNoEsDelJuego() throws Exception {
+    public void persistenciaArchivoQueNoEsDelJuego() throws Exception {
         File f = tmp.newFile("falso.poob");
         try (FileOutputStream out = new FileOutputStream(f)) {
             out.write("esto no es una partida".getBytes());
@@ -989,7 +989,7 @@ public class POOBSoccerTest {
     }
 
     @Test
-    public void persistencia_archivoCorrupto() throws Exception {
+    public void persistenciaArchivoCorrupto() throws Exception {
         TimedMatch m = newMatch(60);
         File ok = new File(tmp.getRoot(), "ok.poob");
         m.save(ok);

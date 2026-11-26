@@ -8,6 +8,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import domain.Ball;
 import domain.BotDifficulty;
@@ -37,7 +38,7 @@ public class GameGUI extends JPanel {
     private boolean progressSaved = false; 
     private final draw drawer = new draw();
     private static final int KEY_RIGHT_CTRL = -9999;
-    public enum MatchType {TIME,GOAL};
+    public enum MatchType {TIME,GOAL}
 
 
     
@@ -236,12 +237,12 @@ public class GameGUI extends JPanel {
 
     private void control(int player, int left, int right, int up, int kick, int superKey) {
         int dir = 0;
-        if (pressed.contains(left)) dir--;
-        if (pressed.contains(right)) dir++;
+        if (pressed.contains(left)) {dir--;}
+        if (pressed.contains(right)) {dir++;}
         match.move(player, dir);
-        if (pressed.contains(up)) match.jump(player);
-        if (pressed.contains(kick)) match.kick(player);
-        if (pressed.contains(superKey)) match.usePower(player);
+        if (pressed.contains(up)) {match.jump(player);}
+        if (pressed.contains(kick)) {match.kick(player);}
+        if (pressed.contains(superKey)) {match.usePower(player);}
     }
 
     @Override
@@ -283,9 +284,9 @@ public class GameGUI extends JPanel {
     /** Guarda la partida actual (solo se llega aquí desde el menú de pausa). */
     private void saveGame() {
         JFileChooser chooser = newChooser();
-        if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
+        if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {return;}
         File file = chooser.getSelectedFile();
-        if (!file.getName().toLowerCase().endsWith(Match.EXTENSION)) {
+        if (!file.getName().toLowerCase(Locale.ROOT).endsWith(Match.EXTENSION)) {
             file = new File(file.getParentFile(), file.getName() + Match.EXTENSION);
         }
         try {
@@ -305,7 +306,7 @@ public class GameGUI extends JPanel {
     /** Abre una partida guardada; queda en pausa para que el jugador la reanude. */
     private void openGame() {
         JFileChooser chooser = newChooser();
-        if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
+        if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {return;}
         try {
             Match loaded = Match.open(chooser.getSelectedFile());
             match = loaded;
@@ -324,8 +325,10 @@ public class GameGUI extends JPanel {
     @Override
     public void doLayout() {
         super.doLayout();
-        if (btnResume == null || btnMenu == null || btnSave == null || btnOpen == null) return;
-        int bw = 220, bh = 50, gap = 15;
+        if (btnResume == null || btnMenu == null || btnSave == null || btnOpen == null) {return;}
+        int bw = 220, 
+            bh = 50, 
+            gap = 15;
         int x = (getWidth() - (2 * bw + gap)) / 2;
         int y = (int) (getHeight() * 0.62);
         btnResume.setBounds(x, y, bw, bh);

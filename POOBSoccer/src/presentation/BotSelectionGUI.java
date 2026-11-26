@@ -3,6 +3,7 @@ package presentation;
 import javax.swing.*;
 import java.awt.*;
 import java.text.Normalizer;
+import java.util.Locale;
 import java.util.Random;
 import domain.Brasil;
 import domain.Cameroon;
@@ -26,11 +27,9 @@ public class BotSelectionGUI extends JPanel {
     private GameGUI gameGUI;
     private JPanel mainContainer;
     private CardLayout cardLayout;
-    private Image imgStart;
 
     private JLabel p1Preview;
     private JLabel p1NameLabel;
-    private JLabel p2NameLabel;
 
     private JButton diffPrev;
     private JButton diffNext;
@@ -140,7 +139,6 @@ public class BotSelectionGUI extends JPanel {
         // Play Button
         java.net.URL url1 = getClass().getResource("/images/startGame.png");
         ImageIcon iconStart = (url1 != null) ? new ImageIcon(url1) : new ImageIcon();
-        imgStart = iconStart.getImage();
         JButton btnStart = new JButton(iconStart);
         btnStart.setBorderPainted(false);       
         btnStart.setContentAreaFilled(false);   
@@ -175,7 +173,7 @@ public class BotSelectionGUI extends JPanel {
     
     /** Un personaje al azar para el bot, distinto al del jugador si hay más de uno. */
     private int randomCpuIndex() {
-        if (AVAILABLE_CHARACTERS.length == 1) return 0;
+        if (AVAILABLE_CHARACTERS.length == 1) {return 0;}
         int i = random.nextInt(AVAILABLE_CHARACTERS.length - 1);
         return (i >= p1Index) ? i + 1 : i;
     }
@@ -209,16 +207,16 @@ public class BotSelectionGUI extends JPanel {
 
     private static String stars(int filled, int total) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < total; i++) sb.append(i < filled ? '★' : '☆');
+        for (int i = 0; i < total; i++) {sb.append(i < filled ? '★' : '☆');}
         return sb.toString();
     }
 
     private ImageIcon getFaceIcon(String country) {
         String clean = Normalizer.normalize(country, Normalizer.Form.NFD)
                                  .replaceAll("\\p{M}", "")
-                                 .toLowerCase();
+                                 .toLowerCase(Locale.ROOT);
         java.net.URL url = getClass().getResource("/images/" + clean + ".png");
-        if (url == null) url = getClass().getResource("/images/face.png");
+        if (url == null) {url = getClass().getResource("/images/face.png");}
 
         if (url != null) {
             Image img = new ImageIcon(url).getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);

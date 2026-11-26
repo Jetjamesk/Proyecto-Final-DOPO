@@ -26,7 +26,8 @@ public class HoverImageButton extends JButton {
     private final double hoverScale;    // cuánto crece (1.12 = 12 % más grande)
 
     private final Rectangle base = new Rectangle();   // posición y tamaño normales
-    private ImageIcon normalIcon, bigIcon;            // íconos ya escalados (se calculan una vez por tamaño)
+    private ImageIcon normalIcon,
+                      bigIcon;            // íconos ya escalados (se calculan una vez por tamaño)
     private boolean hovered = false;
     private Consumer<String> onHoverChange = text -> { };   // por defecto no hace nada
 
@@ -81,7 +82,7 @@ public class HoverImageButton extends JButton {
 
 
     private void setHovered(boolean value) {
-        if (hovered == value) return;
+        if (hovered == value) {return;}
         hovered = value;
         applyBounds();
         onHoverChange.accept(hovered ? description : null);
@@ -93,15 +94,15 @@ public class HoverImageButton extends JButton {
             int bigW = (int) (base.width * hoverScale);
             int bigH = (int) (base.height * hoverScale);
             setBounds(base.x - (bigW - base.width) / 2, base.y - (bigH - base.height) / 2, bigW, bigH);
-            if (bigIcon != null) setIcon(bigIcon);
+            if (bigIcon != null) {setIcon(bigIcon);}
         } else {
             setBounds(base);
-            if (normalIcon != null) setIcon(normalIcon);
+            if (normalIcon != null) {setIcon(normalIcon);}
         }
     }
 
     private void rescaleIcons(int width, int height) {
-        if (image == null || image.getWidth(null) <= 0 || width <= 0 || height <= 0) return;
+        if (image == null || image.getWidth(null) <= 0 || width <= 0 || height <= 0) {return;}
         normalIcon = new ImageIcon(image.getScaledInstance(width, height, Image.SCALE_SMOOTH));
         bigIcon = new ImageIcon(image.getScaledInstance(
                 (int) (width * hoverScale), (int) (height * hoverScale), Image.SCALE_SMOOTH));

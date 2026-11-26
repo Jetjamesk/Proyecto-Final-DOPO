@@ -5,7 +5,7 @@ public abstract class Character extends Physics {
     private static final double BASE_GAP = 30;          // Separación del suelo
     private static final double RADIUS = 35;          // la cabeza CAMBIAR
     private static final double GAP = 30;             // la cabeza flota sobre el suelo para poner el pie
-    private double headScale = 1.0;
+    
     public static final double STUN_DURATION= 3.0;
     private double stunTimer = 0.0;
 
@@ -86,9 +86,9 @@ public abstract class Character extends Physics {
      * Mientras está aturdido no recibe más daño.
      */
     public void takeDamage(double amount){
-        if (amount <= 0 || isStunned()) return;
+        if (amount <= 0 || isStunned()) {return;}
         health = Math.max(0, health - amount);
-        if (health == 0) stunTimer = STUN_DURATION;
+        if (health == 0) {stunTimer = STUN_DURATION;}
     }
 
     
@@ -216,7 +216,6 @@ public abstract class Character extends Physics {
         vy = 0;
         direction = 0;
         onGround = true;
-        headScale = 1.0;
         leg.reset();
         leg.update(0, x, getHipY(), facing, scale, field.getFloorY());
         ArmedShot = null;

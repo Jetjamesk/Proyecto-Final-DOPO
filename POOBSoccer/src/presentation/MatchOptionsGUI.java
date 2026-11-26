@@ -2,7 +2,7 @@ package presentation;
 
 import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.Dimension;
+
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -14,7 +14,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
+
 
 /**
  * Pantalla para elegir el tipo de partido.
@@ -23,9 +23,6 @@ import javax.swing.JSlider;
 public class MatchOptionsGUI extends JPanel {
     private static final double HOVER_SCALE = 1.12;   // el botón crece un 12 % al pasar el mouse
 
-    // Valores con los que se crea cada tipo de partido
-    private static final int DEFAULT_MINUTES = 1;
-    private static final int DEFAULT_GOALS = 5;
 
     private static final String TIME_TEXT =
         "Partido por tiempo: gana quien tenga más goles al acabarse el reloj. Si hay empate, ¡gol de oro!";
@@ -211,7 +208,7 @@ public class MatchOptionsGUI extends JPanel {
 
     /** Alto que respeta la proporción de la imagen, sin pasarse de maxH. */
     private int heightFor(Image img, int width, int maxH) {
-        if (img == null || img.getWidth(null) <= 0) return maxH;
+        if (img == null || img.getWidth(null) <= 0) {return maxH;}
         int hByRatio = (int) (width * img.getHeight(null) / (double) img.getWidth(null));
         return Math.min(hByRatio, maxH);
     }

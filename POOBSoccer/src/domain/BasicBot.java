@@ -13,9 +13,9 @@ public class BasicBot implements Bot {
     }
 
     @Override
-    public void Decide (Match match, int me, double dt){
+    public void decide (Match match, int me, double dt){
         timer -= dt;
-        if (timer > 0) return;                      // todavía no reacciona
+        if (timer > 0) {return;}                      // todavía no reacciona
         timer = reactionTime;
 
         Character self = match.getPlayer(me);

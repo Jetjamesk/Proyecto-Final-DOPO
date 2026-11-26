@@ -6,11 +6,13 @@ public final class Collisions {
     public static boolean bounceOffCircle(Physics b, double restitution,
                                           double cx, double cy, double cr,
                                           double cvx, double cvy) {
-        double dx = b.x - cx, dy = b.y - cy;
+        double dx = b.x - cx,
+               dy = b.y - cy;
         double dist = Math.hypot(dx, dy);
         double min = b.getRadius() + cr;
-        if (dist >= min) return false;
-        double nx = 0, ny = -1;
+        if (dist >= min) {return false;}
+        double nx = 0, 
+               ny = -1;
         if (dist > 0) { nx = dx / dist; ny = dy / dist; }
         b.x = cx + nx * min;
         b.y = cy + ny * min;
@@ -30,10 +32,12 @@ public final class Collisions {
             b.y = f.getFloorY() - r;
             b.vy = -b.vy * restitution;
             b.vx *= groundFriction;
-            if (Math.abs(b.vy) < 20) b.vy = 0;
+            if (Math.abs(b.vy) < 20) {b.vy = 0;}
         }
-        if (b.y - r < 0)            { b.y = r;                b.vy = -b.vy * restitution; }
-        if (b.x - r < 0)            { b.x = r;                b.vx = -b.vx * restitution; }
+        if (b.y - r < 0){ b.y = r;
+            b.vy = -b.vy * restitution; }
+        if (b.x - r < 0){ b.x = r;
+            b.vx = -b.vx * restitution; }
         if (b.x + r > f.getWidth()) { b.x = f.getWidth() - r; b.vx = -b.vx * restitution; }
     }
 

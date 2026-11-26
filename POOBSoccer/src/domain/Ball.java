@@ -13,12 +13,12 @@ public class Ball extends Physics{
     }
 
     public void update(double dt, Field field) {
-        if (shot != null) shot.tick(dt, field);
+        if (shot != null){ shot.tick(dt, field);}
         boolean ownMotion = shot != null && shot.isFlying() && shot.move(this, dt, field);
-        if (!ownMotion) integrate(dt);
+        if (!ownMotion){ integrate(dt);}
         collideWithField(field);
-        if (shot != null && shot.isFlying() && touchesSideWall(field)) shot.endFlight();
-        if (shot != null && shot.isFinished()) shot = null;
+        if (shot != null && shot.isFlying() && touchesSideWall(field)) {shot.endFlight();}
+        if (shot != null && shot.isFinished()){shot = null;}
     }
 
     private boolean touchesSideWall(Field field) {
@@ -50,7 +50,7 @@ public class Ball extends Physics{
 
     /** Un personaje tocó el balón: si va en tiro especial, el tiro le pega. */
     public void hitBy(Character who) {
-        if (shot != null && shot.isFlying()) shot.hit(who);
+        if (shot != null && shot.isFlying()) {shot.hit(who);}
     }
 
     public Shot getShot() {

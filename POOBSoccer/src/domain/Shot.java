@@ -1,5 +1,4 @@
 package domain;
-import java.io.File;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
@@ -42,12 +41,12 @@ public abstract class Shot implements Serializable {
 
     protected void tick(double dt, Field field) {
         time += dt;
-        if (flying && time >= MAX_FLIGHT) flying = false;
+        if (flying && time >= MAX_FLIGHT) {flying = false;}
     }
 
     /** El balón tocó a un personaje. El dueño del tiro no cuenta. */
     public void hit(Character who) {
-        if (!flying || who == owner) return;
+        if (!flying || owner.equals(who)) {return;}
         who.takeDamage(getDamage());
         applyEffect(who);
         flying = false;

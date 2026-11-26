@@ -3,8 +3,10 @@ package domain;
 public abstract class Physics implements java.io.Serializable{
     public static final double GRAVITY = 2500.0;
 
-    protected double x, y;
-    protected double vx, vy;
+    protected double x, 
+                     y;
+    protected double vx, 
+                     vy;
     protected double drag = 1.0;   // Ball usa 0.999; Character no tiene resistencia
 
 

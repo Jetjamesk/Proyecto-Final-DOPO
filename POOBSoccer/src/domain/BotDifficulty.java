@@ -1,5 +1,8 @@
 package domain;
 
+/**
+ * Niveles de dificultad del bot
+ */
 public enum BotDifficulty {
     TORPE("Torpe") {
         @Override
@@ -18,12 +21,20 @@ public enum BotDifficulty {
         public Bot createBot() { return new BasicBot(0.05); }
     };
 
-    private final String displayName;
+    private final String displayName;  // Nombre que se muestra al usuario
 
+    /**
+     * Crea un nivel de dificultad
+     * @param displayName
+     */
     BotDifficulty(String displayName) {
         this.displayName = displayName;
     }
 
+    /**
+     *
+     * @return El nombre del nivel por mostar al usuario
+     */
     public String getDisplayName() {
         return displayName;
     }

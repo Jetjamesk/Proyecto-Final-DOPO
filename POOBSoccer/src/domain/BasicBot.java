@@ -6,12 +6,22 @@ public class BasicBot implements Bot {
     private static final double HEAD_REACH = 60; //Distacia para saltar a cabecear
 
     private final double reactionTime; //Cuantos segundos peinsa
-    private double timer = 0;
+    private double timer = 0;       // Cuenta regresiva para la proxima desicion
 
+    /**
+     * Crear el bot basico
+     * @param reactionTime
+     */
     public BasicBot (double reactionTime) {
         this.reactionTime = reactionTime;
     }
 
+    /**
+     * Decide que personaje en este instante
+     * @param match El partido
+     * @param me   Del juagdor 0 si es izquierda y 1 derecha
+     * @param dt   segundos desde la ultima vez que se llamo
+     */
     @Override
     public void Decide (Match match, int me, double dt){
         timer -= dt;

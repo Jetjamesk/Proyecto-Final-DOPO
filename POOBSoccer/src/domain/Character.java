@@ -1,5 +1,8 @@
 package domain;
 
+/**
+ * Jugador del partido
+ */
 public abstract class Character extends Physics {
     //Valores base para el encogimiento
     private static final double BASE_GAP = 30;          // Separación del suelo
@@ -71,17 +74,23 @@ public abstract class Character extends Physics {
         }
     }
 
+    /**
+     * Marca que la patada actual ya toco el balon
+     */
     public void kickTouchedBall(){
         leg.markHit();
     }
-    
 
+    /**
+     * La patada le hace daño al rival
+     * @param rival personaje golpeando
+     */
     public void landKick(Character rival){
         rival.takeDamage(stats.kickDamage());
         leg.markHit();
     }
 
-        /**
+    /**
      * Recibe daño; la vida nunca baja de 0. Al llegar a 0 queda aturdido.
      * Mientras está aturdido no recibe más daño.
      */
@@ -91,7 +100,9 @@ public abstract class Character extends Physics {
         if (health == 0) stunTimer = STUN_DURATION;
     }
 
-    
+    /**
+     * Restaura la vida al personaje
+     */
     public void restoreHealth(){
         health = stats.maxHealth();
         stunTimer = 0.0;
@@ -155,7 +166,11 @@ public abstract class Character extends Physics {
     }
 
 
-
+    /**
+     * Avanza el personaje
+     * @param dt Segundos que avanza la simulacion
+     * @param field  cancha donde se encuntran
+     */
     public void update(double dt, Field field) {
         // 1. Temporizadores de los efectos
         if (shrinkTimer > 0) {
@@ -229,7 +244,7 @@ public abstract class Character extends Physics {
         ball.launch(ArmedShot);
         ArmedShot = null;
     }
-
+    
     public boolean hasArmedShot(){
         return ArmedShot!=null;
     }
@@ -343,6 +358,4 @@ public abstract class Character extends Physics {
     public double getHealth()    { return health; }
     public double getMaxHealth() { return stats.maxHealth(); }
     public double getStunTimer() { return stunTimer; }
-
-
 }

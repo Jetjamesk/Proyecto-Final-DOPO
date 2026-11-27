@@ -12,7 +12,7 @@ public class GoalMatch extends Match {
 
 
     public void updateMatch(double dt){
-        if (!isRunning || isPaused || dt <= 0) return;
+        if (!isRunning || isPaused || dt <= 0) {return;}
         updateBots(dt);
         int steps = (int) Math.ceil(dt / STEP);
         double h = dt / steps;
@@ -23,16 +23,16 @@ public class GoalMatch extends Match {
     }
     public void checkGoal(){
         int conceded = field.goalConcededBy(ball);
-        if (conceded < 0) return;
+        if (conceded < 0) {return;}
         scoreboard.goalConcededBy(conceded);
         int scorer = 1 - conceded;
-        if (scoreboard.getGoals(scorer) >= goalsToWin) endMatch();
-        else resetRound();
+        if (scoreboard.getGoals(scorer) >= goalsToWin) {endMatch();}
+        else {resetRound();}
     }
     public double getTimeLeft(){
         return 0.0;
-    };
+    }
     public boolean isGoldenGoal(){
         return false;
-    };
+    }
 }

@@ -1,12 +1,13 @@
 package domain;
 
 import java.io.*;
+import java.util.Locale;
 
 /**
  * Progreso de un jugador: sus puntos y el nivel de cada estadística.
  * Aplica a todos los personajes que use el jugador y se conserva de un partido a otro.
  */
-public class PlayerStats implements java.io.Serializable {
+public class PlayerStats implements Serializable {
     private static final long serialVersionUID = 1L;
     public static final String EXTENSION = ".stats";
     private static final String HEADER = "POOBSoccer-Stats-";
@@ -27,7 +28,7 @@ public class PlayerStats implements java.io.Serializable {
     }
 
     public void addPoints(int amount) {
-        if (amount > 0) points += amount;
+        if (amount > 0) {points += amount;}
     }
 
     /** Recompensa por un partido terminado. */
@@ -46,15 +47,16 @@ public class PlayerStats implements java.io.Serializable {
 
     /** Gasta puntos para subir un nivel. Devuelve false si no alcanza o ya está al máximo. */
     public boolean upgrade(Stat stat) {
-        if (!canUpgrade(stat)) return false;
+        if (!canUpgrade(stat)) {return false;}
         points -= upgradeCost(stat);
         levels[stat.ordinal()]++;
         return true;
     }
     public static void save(File file, PlayerStats[] players) throws POOBSoccerException {
-        if (file == null) throw new POOBSoccerException(POOBSoccerException.FILE_NULL);
-        if (!file.getName().toLowerCase().endsWith(EXTENSION))
+        if (file == null) {throw new POOBSoccerException(POOBSoccerException.FILE_NULL);}
+        if (!file.getName().toLowerCase(Locale.ROOT).endsWith(EXTENSION)){
             throw new POOBSoccerException(POOBSoccerException.WRONG_EXTENSION);
+        }
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
             out.writeUTF(HEADER);
             out.writeObject(players);
@@ -64,14 +66,20 @@ public class PlayerStats implements java.io.Serializable {
     }
 
     public static PlayerStats[] open(File file) throws POOBSoccerException {
-        if (file == null) throw new POOBSoccerException(POOBSoccerException.FILE_NULL);
-        if (!file.isFile()) throw new POOBSoccerException(POOBSoccerException.FILE_NOT_FOUND);
+        if (file == null) {
+            throw new POOBSoccerException(POOBSoccerException.FILE_NULL);
+        }
+        if (!file.isFile()) {
+            throw new POOBSoccerException(POOBSoccerException.FILE_NOT_FOUND);
+        }
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
-            if (!HEADER.equals(in.readUTF()))
+            if (!HEADER.equals(in.readUTF())){
                 throw new POOBSoccerException(POOBSoccerException.NOT_POOBSccoer_FILE);
+            }
             Object obj = in.readObject();
-            if (!(obj instanceof PlayerStats[]))
+            if (!(obj instanceof PlayerStats[])){
                 throw new POOBSoccerException(POOBSoccerException.NOT_POOBSccoer_FILE);
+            }
             return (PlayerStats[]) obj;
         } catch (IOException | ClassNotFoundException e) {
             throw new POOBSoccerException(POOBSoccerException.CORRUPT_DATA);

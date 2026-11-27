@@ -7,5 +7,5 @@ public interface Bot extends java.io.Serializable {
      * @param me   Del juagdor 0 si es izquierda y 1 derecha
      * @param dt   segundos desde la ultima vez que se llamo
      */
-    public void Decide(Match match,int me, double dt);
+    public void decide(Match match,int me, double dt);
 }

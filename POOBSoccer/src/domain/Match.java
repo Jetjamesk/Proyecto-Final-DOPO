@@ -1,6 +1,7 @@
 package domain;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public abstract class Match implements Serializable {
     public static final String EXTENSION = ".poob";
@@ -60,7 +61,7 @@ public abstract class Match implements Serializable {
 
     
     public void endMatch(){
-        if (!isRunning) return;        
+        if (!isRunning) {return;}
         isRunning = false;
         int leader = scoreboard.leader();
         winner = leader < 0 ? null : jugadores.get(leader);
@@ -71,7 +72,10 @@ public abstract class Match implements Serializable {
     /** Informa el resultado a cada jugador; PlayerStats decide cuántos puntos da. */
     private void awardPoints(){
         for (Character p : jugadores) {
-            p.getPlayerStats().rewardMatch(p == winner);
+            if (winner.equals(p)){
+                p.getPlayerStats().rewardMatch(true);
+            }
+            
         }
     }
 
@@ -92,11 +96,11 @@ public abstract class Match implements Serializable {
      * 
      */
     public  void move(int player, int direction){
-        if (isRunning && !isPaused) jugadores.get(player).movement(direction);
+        if (isRunning && !isPaused) {jugadores.get(player).movement(direction);}
     }
 
     public void jump(int player){
-        if (isRunning && !isPaused) jugadores.get(player).jump();
+        if (isRunning && !isPaused) {jugadores.get(player).jump();}
     }
 
     public void kick(int player){
@@ -132,7 +136,7 @@ public abstract class Match implements Serializable {
         if (file == null) {
             throw new POOBSoccerException(POOBSoccerException.FILE_NULL);
         }
-        if (!file.getName().toLowerCase().endsWith(EXTENSION)) {
+        if (!file.getName().toLowerCase(Locale.ROOT).endsWith(EXTENSION)) {
             throw new POOBSoccerException(POOBSoccerException.WRONG_EXTENSION);
         }
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
@@ -153,7 +157,7 @@ public abstract class Match implements Serializable {
         if (file == null) {
             throw new POOBSoccerException(POOBSoccerException.FILE_NULL);
         }
-        if (!file.getName().toLowerCase().endsWith(EXTENSION)) {
+        if (!file.getName().toLowerCase(Locale.ROOT).endsWith(EXTENSION)) {
             throw new POOBSoccerException(POOBSoccerException.WRONG_EXTENSION);
         }
         if (!file.isFile()) {
@@ -181,9 +185,9 @@ public abstract class Match implements Serializable {
     }
 
     protected void updateBots(double dt) {
-        if (!isRunning || isPaused) return;
+        if (!isRunning || isPaused) {return;}
         for (int i = 0; i < bots.length; i++) {
-            if (bots[i] != null) bots[i].Decide(this, i, dt);
+            if (bots[i] != null) {bots[i].decide(this, i, dt);}
         }
     }
 

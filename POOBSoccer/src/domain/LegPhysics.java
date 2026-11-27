@@ -6,11 +6,13 @@ public class LegPhysics implements java.io.Serializable{
     private static final double BASE_LEG = 55;      // largo de la pierna
     private static final double BASE_FOOT_RADIUS = 18;
 
-    private final double KICK_DURATION = 0.25;  // más fuerza = patada más rápida
+    private static final double KICK_DURATION = 0.25;  // más fuerza = patada más rápida
     private double kickTimer;           // > 0 mientras está pateando
     private boolean hit;
-    private double footX, footY;
-    private double footVx, footVy;
+    private double footX, 
+                   footY;
+    private double footVx, 
+                   footVy;
     private double footTilt;
 
 

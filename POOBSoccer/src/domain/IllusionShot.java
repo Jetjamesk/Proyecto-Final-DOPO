@@ -27,7 +27,7 @@ public class IllusionShot extends Shot {
         ball.placeAt(owner.getX() + dir * (owner.getRadius() + ball.getRadius() + 2), owner.getY());
         ball.vx = dir * SPEED;
         for (int k = -4; k <= 3; k++) {                 // 7 falsos: todos menos k = 0 (el real)
-            if (k != 0) decoys.add(new Decoy(ball.getX(), ball.getY(), ball.vx, k * 110.0, ball.getRadius()));
+            if (k != 0) {decoys.add(new Decoy(ball.getX(), ball.getY(), ball.vx, k * 110.0, ball.getRadius()));}
         }
     }
 
@@ -43,7 +43,7 @@ public class IllusionShot extends Shot {
         super.tick(dt, field);
         if (effectTimer > 0) {
             effectTimer = Math.max(0, effectTimer - dt);
-            for (Decoy d : decoys) d.update(dt, field);
+            for (Decoy d : decoys) {d.update(dt, field);}
         }
     }
 

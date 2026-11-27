@@ -3,6 +3,8 @@ package presentation;
 import javax.swing.*;
 import java.awt.*;
 import java.text.Normalizer;
+import java.util.Locale;
+
 import domain.SouthKorea;
 import domain.Cameroon;
 import domain.Nigeria;
@@ -21,7 +23,6 @@ public class CharacterSelectionGUI extends JPanel {
     private GameGUI gameGUI;
     private JPanel mainContainer;
     private CardLayout cardLayout;
-    private Image imgStart;
 
     private JLabel p1Preview;
     private JLabel p2Preview;
@@ -128,7 +129,6 @@ public class CharacterSelectionGUI extends JPanel {
         // Play Button
         java.net.URL url1 = getClass().getResource("/images/startGame.png");
         ImageIcon iconStart = (url1 != null) ? new ImageIcon(url1) : new ImageIcon();
-        imgStart = iconStart.getImage();
         JButton btnStart = new JButton(iconStart);
         btnStart.setBorderPainted(false);       
         btnStart.setContentAreaFilled(false);   
@@ -189,9 +189,9 @@ public class CharacterSelectionGUI extends JPanel {
         String clean = Normalizer.normalize(country, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "")
                 .replaceAll("\\s+", "")
-                .toLowerCase();
+                .toLowerCase(Locale.ROOT);
         java.net.URL url = getClass().getResource("/images/" + clean + ".png");
-        if (url == null) url = getClass().getResource("/images/face.png");
+        if (url == null){ url = getClass().getResource("/images/face.png");}
 
         if (url != null) {
             Image img = new ImageIcon(url).getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);

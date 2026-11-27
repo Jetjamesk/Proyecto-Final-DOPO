@@ -1,6 +1,5 @@
 package domain;
 
-import java.sql.Time;
 
 /** Nigeria - Tornado: remolino a ras de suelo que rebota rápido; deja inconsciente al rival. */
 public class TornadoShot extends Shot {

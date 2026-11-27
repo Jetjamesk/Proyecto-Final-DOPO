@@ -14,18 +14,21 @@ public class DefensiveBot implements Bot {
     }
 
     @Override
-    public void Decide(Match match, int me, double dt) {
+    public void decide(Match match, int me, double dt) {
         timer -= dt;
-        if (timer > 0) return;
+        if (timer > 0) {return;}
         timer = reactionTime;
 
         Character self = match.getPlayer(me);
         Ball ball = match.getBall();
         int attack = self.getFacing();
         double width = match.getField().getWidth();
-        double ownGoalX = (attack == 1) ? 0 : width;   
-
-        
+        double ownGoalX;
+        if (attack == 1) {
+            ownGoalX = 0;
+        } else {
+            ownGoalX = width;
+        }
         boolean ballInMyHalf = Math.abs(ball.getX() - ownGoalX) < width / 2;
         double target = ballInMyHalf
                 ? ball.getX() - attack * KICK_SPOT        
@@ -36,11 +39,11 @@ public class DefensiveBot implements Bot {
 
         double ahead = (ball.getX() - self.getX()) * attack;
         double dist = Math.hypot(ball.getX() - self.getX(), ball.getY() - self.getY());
-        if (ahead > 0 && dist <= KICK_REACH) match.kick(me);
+        if (ahead > 0 && dist <= KICK_REACH) {match.kick(me);}
         if (ball.getY() < self.getY() - 20 && Math.abs(ball.getX() - self.getX()) < HEAD_REACH) {
             match.jump(me);
         }
 
-        if (self.isSuperReady()) match.usePower(me);
+        if (self.isSuperReady()) {match.usePower(me);}
     }
 }

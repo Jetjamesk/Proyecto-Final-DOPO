@@ -84,9 +84,9 @@ public class draw {
 
     /** Avanza las animaciones un cuadro. Se llama en cada tick del juego. */
     public void update(Match match) {
-        if (!match.isPaused()) animTick++;
+        if (!match.isPaused()) {animTick++;}
         detectLaunch(match);
-        if (burstFrames > 0) burstFrames--;
+        if (burstFrames > 0) {burstFrames--;}
     }
 
     /** Si el balón acaba de salir en tiro especial, arranca la onda de lanzamiento. */
@@ -121,7 +121,7 @@ public class draw {
 
         drawField(g2d, field);
         drawGoals(g2d, field);
-        for (int i = 0; i < 2; i++) drawCharacter(g2d, match.getPlayer(i), i, field.getFloorY());
+        for (int i = 0; i < 2; i++) {drawCharacter(g2d, match.getPlayer(i), i, field.getFloorY());}
 
         drawBall(g2d, match);
         drawLaunchBurst(g2d);
@@ -451,7 +451,7 @@ public class draw {
         Stroke old = g2d.getStroke();
         for (int i = 0; i < 2; i++) {
             double rr = 26 + (progress - i * 0.15) * 110;
-            if (rr <= 0) continue;
+            if (rr <= 0) {continue;}
             int alpha = (int) (Math.max(0, 1 - progress) * 220);
             g2d.setStroke(new BasicStroke(6f - i * 2));
             g2d.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), alpha));
@@ -625,7 +625,7 @@ public class draw {
     private static Image trimTransparent(Image img) {
         int w = img.getWidth(null);
         int h = img.getHeight(null);
-        if (w <= 0 || h <= 0) return img;
+        if (w <= 0 || h <= 0) {return img;}
 
         BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = bi.createGraphics();
@@ -637,14 +637,14 @@ public class draw {
             for (int x = 0; x < w; x++) {
                 int alpha = (bi.getRGB(x, y) >>> 24) & 0xFF;
                 if (alpha > 20) {                       // píxel visible
-                    if (x < minX) minX = x;
-                    if (x > maxX) maxX = x;
-                    if (y < minY) minY = y;
-                    if (y > maxY) maxY = y;
+                    if (x < minX) {minX = x;}
+                    if (x > maxX) {maxX = x;}
+                    if (y < minY) {minY = y;}
+                    if (y > maxY) {maxY = y;}
                 }
             }
         }
-        if (maxX < 0) return img;                       // imagen totalmente transparente
+        if (maxX < 0) {return img;}                       // imagen totalmente transparente
         return bi.getSubimage(minX, minY, maxX - minX + 1, maxY - minY + 1);
     }
 }

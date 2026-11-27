@@ -25,12 +25,12 @@ public class Ball extends Physics{
      * @param field  cancha en donde se mueve el balon
      */
     public void update(double dt, Field field) {
-        if (shot != null) shot.tick(dt, field);
+        if (shot != null){ shot.tick(dt, field);}
         boolean ownMotion = shot != null && shot.isFlying() && shot.move(this, dt, field);
-        if (!ownMotion) integrate(dt);
+        if (!ownMotion){ integrate(dt);}
         collideWithField(field);
-        if (shot != null && shot.isFlying() && touchesSideWall(field)) shot.endFlight();
-        if (shot != null && shot.isFinished()) shot = null;
+        if (shot != null && shot.isFlying() && touchesSideWall(field)) {shot.endFlight();}
+        if (shot != null && shot.isFinished()){shot = null;}
     }
 
 
@@ -88,7 +88,7 @@ public class Ball extends Physics{
      * @param who personaje que toco el balon
      */
     public void hitBy(Character who) {
-        if (shot != null && shot.isFlying()) shot.hit(who);
+        if (shot != null && shot.isFlying()) {shot.hit(who);}
     }
 
     /**
